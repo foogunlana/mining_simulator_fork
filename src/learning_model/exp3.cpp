@@ -16,15 +16,10 @@ namespace learning_model {
         size_t numPlayers_,
         double phi_) :
         strategies(std::move(strategies_)),
-        phi(phi_),
-        numStrategies(strategies.size()),
-        numPlayers(numPlayers_)
+        phi(phi_)
     {
         assert(strategies.size() > 0);
-
-        playerStrategies.resize(numPlayers);
-        playersWeights.reserve(numPlayers);
-        playersProbabilities.resize(numPlayers);
+        playersWeights.reserve(numPlayers_);
 
         StratWeight totalWeight(0);
         for (auto &strategy : strategies) {
@@ -36,36 +31,26 @@ namespace learning_model {
         }
 
         std::vector<StratWeight> weights;
-        weights.reserve(numStrategies);
+        weights.reserve(strategies.size());
         std::transform(
             std::begin(strategies),
             std::end(strategies),
             std::back_inserter(weights),
             [](const auto &s) { return s->weight; });
 
-        for (size_t i = 0; i < numPlayers; i++) {
+        for (size_t i = 0; i < numPlayers_; i++) {
             playersWeights.push_back(weights);
         }
     }
 
-    void Exp3::pickNewStrategies(size_t numPlayers) {
-        static std::random_device *rd = new std::random_device();
-        static std::mt19937 gen((*rd)());
-
-        for (size_t player = 0; player < numPlayers; player++) {
-            std::vector<double> probabilities = probabilitiesForPlayer(player);
-            std::discrete_distribution<std::size_t> dis(begin(probabilities), end(probabilities));
-            size_t stratIndex = dis(gen);
-            playerStrategies[player] = stratIndex;
-        }
-    }
-
-    std::vector<double> Exp3::probabilitiesForPlayer(size_t player) {
+    std::vector<double> Exp3::weightsToProbabilities(const std::vector<StratWeight> &weights) {
         std::vector<double> probabilities;
+        size_t numStrategies = weights.size();
+        assert(numStrategies != 0);
         probabilities.reserve(numStrategies);
 
         for (size_t strategyIndex = 0; strategyIndex < numStrategies; strategyIndex++) {
-            double probability = (1 - phi) * rawWeight(playersWeights[player][strategyIndex]) + phi / numStrategies;
+            double probability = (1 - phi) * rawWeight(weights[strategyIndex]) + phi / numStrategies;
 
             assert(probability > 0);
             assert(!isnan(probability) && !isinf(probability));
@@ -73,32 +58,62 @@ namespace learning_model {
 
             probabilities.push_back(probability);
         }
-        playersProbabilities[player] = probabilities;
-
-        return playersProbabilities[player];
+        return probabilities;
     }
 
-    void Exp3::updateWeights(std::vector<Value> rewards, Value maxPossibleReward) {
+    std::vector<size_t> Exp3::pickNewStrategies(std::vector<std::vector<double>> &probabilities) {
+        static std::random_device *rd = new std::random_device();
+        static std::mt19937 gen((*rd)());
+
+        size_t numPlayers = probabilities.size();
+        assert(numPlayers > 0);
+        std::vector<size_t> playerStrategies;
+
+        playerStrategies.resize(numPlayers);
+
+        for (size_t player = 0; player < numPlayers; player++) {
+            std::discrete_distribution<std::size_t> dis(begin(probabilities[player]), end(probabilities[player]));
+            size_t stratIndex = dis(gen);
+            playerStrategies[player] = stratIndex;
+        }
+        return playerStrategies;
+    }
+
+    void Exp3::updateWeights(
+        size_t numPlayers,
+        const std::vector<std::vector<StratWeight>> &oldWeights,
+        const std::vector<std::vector<double>> &oldProbabilities,
+        const std::vector<size_t> &oldStrategies,
+        const std::vector<Value> &rewards,
+        Value maxPossibleReward
+    ) {
+        size_t numStrategies = oldStrategies.size();
+        std::vector<std::vector<StratWeight>> newWeights;
+        newWeights.resize(oldWeights.size());
+        for(auto &weights : newWeights) {
+            weights.resize(oldWeights[0].size());
+        }
 
         for (size_t player = 0; player < numPlayers; player++) {
             double rewardRatio = valuePercentage(rewards[player], maxPossibleReward);
             double normalizedReward(fmin(rewardRatio, 1.0));
-            double gHat = normalizedReward / playersProbabilities[player][playerStrategies[player]];
+            double gHat = normalizedReward / oldProbabilities[player][oldStrategies[player]];
             double weightAdjustment = exp((phi * gHat) / numStrategies);
 
-            StratWeight oldWeight = playersWeights[player][playerStrategies[player]];
-            playersWeights[player][playerStrategies[player]] *= StratWeight(weightAdjustment);
-            StratWeight maxWeight = StratWeight(1) - oldWeight + playersWeights[player][playerStrategies[player]];
+
+            StratWeight oldWeight = oldWeights[player][oldStrategies[player]];
+            newWeights[player][oldStrategies[player]] *= StratWeight(weightAdjustment);
+            StratWeight maxWeight = StratWeight(1) - oldWeight + newWeights[player][oldStrategies[player]];
 
             for (size_t i = 0; i < numStrategies; i++) {
-                playersWeights[player][i] /= maxWeight;
+                newWeights[player][i] /= maxWeight;
             }
         }
 
         std::vector<StratWeight> weights;
         weights.resize(numStrategies);
 
-        for (auto &playerWeights : playersWeights) {
+        for (auto &playerWeights : newWeights) {
             for (size_t i = 0; i < numStrategies; i++) {
                 weights[i] += playerWeights[i];
             }
@@ -110,7 +125,7 @@ namespace learning_model {
     }
 
     StratWeight Exp3::getStrategyWeight(size_t i) const {
-        return strategies.at(i)->weight;
+        return strategies[i]->weight;
     }
 
 }
