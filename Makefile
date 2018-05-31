@@ -9,7 +9,7 @@ LDLIBS := -lgsl -lcblas
 # LDLIBS := -lgsl
 
 # MODULES := learning_model,utils
-SRCS := $(wildcard src/learning_model/*.cpp)
+SRCS := $(wildcard src/learning_model/*.cpp) $(wildcard src/utils/*.cpp)
 OBJS := $(patsubst %.cpp,%.o,$(SRCS))
 
 CATCH_TST := tests/tests-main

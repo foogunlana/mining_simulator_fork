@@ -20,13 +20,15 @@ namespace learning_model {
     private:
         std::vector<std::unique_ptr<Strategy>> strategies;
         std::vector<size_t> playerStrategies;
-        std::vector<std::vector<StratWeight>> playerWeights;
-        std::vector<std::vector<double>> playerProbabilities;
+        std::vector<std::vector<StratWeight>> playersWeights;
+        std::vector<std::vector<double>> playersProbabilities;
 
-        double phi;
-
+        const double phi;
         const size_t numStrategies;
         const size_t numPlayers;
+
+        std::vector<double> probabilitiesForPlayer(size_t player);
+
     public:
         Exp3(
             std::vector<std::unique_ptr<Strategy>>& strategies,
@@ -35,9 +37,9 @@ namespace learning_model {
         );
 
         // NOTE: following is api without tests
-        void pickNewStrategies(double phi, size_t numPlayers);
-        void updateWeights(std::vector<Value> rewards, Value maxReward, double phi);
-        void getWeightsForPlayer();
+        void pickNewStrategies(size_t numPlayers);
+        void updateWeights(std::vector<Value> rewards, Value maxReward);
+        StratWeight getStrategyWeight(size_t strategyIndex) const;
     };
 }
 
