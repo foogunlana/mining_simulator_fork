@@ -16,16 +16,58 @@ SCENARIO("Exp3 learning model") {
     std::vector<std::unique_ptr<LM::Strategy>> strategies;
     strategies.push_back(std::move(s1));
     strategies.push_back(std::move(s2));
-    size_t numPlayers(2);
+    size_t numStrategies = strategies.size();
     double phi(.01);
 
-    SECTION("Initialization") {
+    GIVEN("strategies picked somehow") {
 
-        LM::Exp3 model(strategies, numPlayers, phi);
+        LM::Exp3 model(strategies, phi);
+        size_t numPlayers = 4;
+        std::vector<LM::PlayerProfile> profiles = model.pickStrategiesEvenly(numPlayers);
 
-        THEN("weights are normalised and initialized") {
-            REQUIRE(model.getStrategyWeight(0) == 0.8);
-            REQUIRE(model.getStrategyWeight(1) == 0.2);
+        // NOTE: should test randomness of strategy picking somehow...
+
+        THEN("returns player profiles with no rewards") {
+            for (size_t i = 0; i < numPlayers - 1; i++) {
+                REQUIRE(profiles[i].currentReward == 0);
+            }
+        }
+
+        THEN("returns players, each with some strategy") {
+            for (size_t i = 0; i < numPlayers - 1; i++) {
+                REQUIRE(profiles[i].currentStrategy < numStrategies);
+            }
+        }
+    }
+
+    GIVEN("strategies picked evenly [pickStrategiesEvenly]") {
+
+        LM::Exp3 model(strategies, phi);
+        size_t numPlayers = 4;
+        std::vector<LM::PlayerProfile> profiles = model.pickStrategiesEvenly(numPlayers);
+
+        THEN("returns correct number of player profiles") {
+            REQUIRE(profiles.size() == numPlayers);
+        }
+
+        THEN("results in original normalised weights") {
+            double total = weight1 + weight2;
+            for (size_t i = 0; i < numPlayers - 1; i++) {
+                CHECK(profiles[i].weights[0] == weight1 / total);
+                CHECK(profiles[i].weights[1] == weight2 / total);
+            }
+        }
+
+        THEN("results in equal weights") {
+            for (size_t i = 0; i < numPlayers - 1; i++) {
+                REQUIRE(profiles[i].weights == profiles[i+1].weights);
+            }
+        }
+
+        THEN("results in equal strategy probabilities for each player") {
+            for (size_t i = 0; i < numPlayers - 1; i++) {
+                REQUIRE(profiles[i].probabilities == profiles[i+1].probabilities);
+            }
         }
     }
 
@@ -37,13 +79,9 @@ SCENARIO("Exp3 learning model") {
             std::vector<std::unique_ptr<LM::Strategy>> strategies2;
             strategies2.push_back(std::move(s1));
             strategies2.push_back(std::move(s2));
-            size_t numPlayers(2);
             double phi(.01);
-            LM::Exp3 model2(strategies2, numPlayers, phi);
+            LM::Exp3 model2(strategies2, phi);
 
-            StratWeight weightA = model2.getStrategyWeight(0);
-            StratWeight weightB = model2.getStrategyWeight(1);
-            REQUIRE(model2.getStrategyWeight(0) == model2.getStrategyWeight(1));
         }
     }
 }
