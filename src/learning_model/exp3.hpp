@@ -16,33 +16,30 @@ namespace learning_model {
 
     class Strategy;
 
+    struct PlayerProfile {
+        std::vector<StratWeight> weights;
+        std::vector<double> probabilities;
+        size_t currentStrategy;
+        Value currentReward;
+    };
+
     class Exp3 {
     private:
         std::vector<std::unique_ptr<Strategy>> strategies;
-        std::vector<std::vector<StratWeight>> playersWeights;
-        
         const double phi;
 
-        std::vector<double> probabilitiesForPlayer(size_t player);
-
+        std::vector<double> probabilitiesFromWeights(const std::vector<StratWeight> &weights);
     public:
         Exp3(
             std::vector<std::unique_ptr<Strategy>>& strategies,
-            size_t numPlayers,
             double phi
         );
 
         // NOTE: following is api without tests
-        std::vector<size_t> pickNewStrategies(std::vector<std::vector<double>> &probabilities);
-        std::vector<double> weightsToProbabilities(const std::vector<StratWeight> &weights);
-        void updateWeights(
-            size_t numPlayers,
-            const std::vector<std::vector<StratWeight>> &oldWeights,
-            const std::vector<std::vector<double>> &oldProbabilities,
-            const std::vector<size_t> &oldStrategies,
-            const std::vector<Value> &rewards,
-            Value maxPossibleReward);
-        StratWeight getStrategyWeight(size_t strategyIndex) const;
+        std::vector<PlayerProfile> pickStrategiesEvenly(size_t numPlayers);
+        std::vector<PlayerProfile> pickStrategiesWithWeights(
+            size_t numPlayers, const std::vector<std::vector<StratWeight>> &weights);
+        std::vector<StratWeight> updateWeights(const std::vector<PlayerProfile> &profiles, Value maxPossibleReward);
     };
 }
 
