@@ -123,27 +123,80 @@ SCENARIO("Exp3 learning model") {
         double phi(.01);
         LM::Exp3 model2(strategies2, phi);
 
-        THEN("only biased strategy is selected") {
-            size_t numPlayers = 5;
-            std::vector<LM::PlayerProfile> profiles = model2.pickStrategiesEvenly(numPlayers);
-            for (auto &player : profiles) {
-                REQUIRE(player.currentStrategy == 2);
-            }
+        // WARNING: implement to assert with high probability, but not certainty
+        THEN("only biased strategy is selected {MOST OF THE TIME}") {
+            // size_t numPlayers = 5;
+            // std::vector<LM::PlayerProfile> profiles = model2.pickStrategiesEvenly(numPlayers);
+            // for (auto &player : profiles) {
+            //     REQUIRE(player.currentStrategy == 2);
+            // }
         }
 
         THEN("biased probability is approximately 1 and others are 0") {
             size_t numPlayers = 3;
+            size_t biasedStrategy = 2;
             std::vector<LM::PlayerProfile> profiles = model2.pickStrategiesEvenly(numPlayers);
             for (auto &player : profiles) {
                 for (size_t strategy = 0; strategy < strategies2.size(); strategy++) {
-                    if (strategy == player.currentStrategy) continue;
-                    REQUIRE(player.probabilities[player.currentStrategy] == 0);
+                    if (strategy == biasedStrategy) continue;
+                    REQUIRE(player.probabilities[biasedStrategy] == 0);
                 }
-                REQUIRE(player.probabilities[player.currentStrategy] == Approx(1).epsilon(0.01));
+                REQUIRE(player.probabilities[biasedStrategy] == Approx(1).epsilon(0.01));
             }
         }
     }
 
-    SECTION("updating weights") {
+    SECTION("updating weights [updateWeights]") {
+        double weight1(4);
+        auto s1(std::make_unique<LM::Strategy>("strategy1", weight1));
+        auto s2(std::make_unique<LM::Strategy>("strategy2", weight1));
+        auto s3(std::make_unique<LM::Strategy>("strategy3", weight1));
+
+        StratWeight total(0);
+
+        std::vector<std::unique_ptr<LM::Strategy>> strategies;
+        strategies.push_back(std::move(s1));
+        strategies.push_back(std::move(s2));
+        strategies.push_back(std::move(s3));
+        for (auto &s : strategies) {
+            total += s->weight;
+        }
+
+        size_t numStrategies = strategies.size();
+        double phi(.01);
+
+        GIVEN("even strategies and biased rewards") {
+            LM::Exp3 model(strategies, phi);
+            std::vector<LM::PlayerProfile> profiles = model.pickStrategiesEvenly(3);
+            profiles[0].currentStrategy = 1;
+            profiles[0].currentReward = Value(100);
+            profiles[1].currentStrategy = 0;
+            profiles[1].currentReward = Value(0);
+            profiles[2].currentStrategy = 2;
+            profiles[2].currentReward = Value(0);
+            std::vector<StratWeight> originalWeights = model.getStrategyWeights();
+            for (auto i = 0; i < originalWeights.size() - 1; i++) {
+                CHECK(originalWeights[i] == originalWeights[i+1]);
+            }
+
+            THEN("result is biased updated strategy weights") {
+                Value maxPossibleReward(Value(1));
+                model.updateWeights(profiles, maxPossibleReward);
+                std::vector<StratWeight> strategyWeights = model.getStrategyWeights();
+                REQUIRE(strategyWeights[1] > strategyWeights[0]);
+                REQUIRE(strategyWeights[1] > strategyWeights[2]);
+            }
+
+            THEN("returns biased player weights") {
+                Value maxPossibleReward(Value(1));
+                std::vector<std::vector<StratWeight>> weights = model.updateWeights(
+                    profiles, maxPossibleReward);
+
+                for (auto &playerWeights : weights) {
+                    REQUIRE(playerWeights[1] > playerWeights[0]);
+                    REQUIRE(playerWeights[1] > playerWeights[2]);
+                }
+            }
+        }
     }
 }
