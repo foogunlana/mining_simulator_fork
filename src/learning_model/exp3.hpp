@@ -28,17 +28,17 @@ namespace learning_model {
         std::vector<std::unique_ptr<Strategy>> strategies;
         const double phi;
 
-        std::vector<double> probabilitiesFromWeights(const std::vector<StratWeight> &weights);
+        std::vector<double> probabilitiesFromWeights(const std::vector<StratWeight> &weights) const;
     public:
         Exp3(
             std::vector<std::unique_ptr<Strategy>>& strategies,
             double phi
         );
 
-        std::vector<PlayerProfile> pickStrategiesEvenly(size_t numPlayers);
+        std::vector<PlayerProfile> pickStrategiesEvenly(size_t numPlayers) const;
         std::vector<PlayerProfile> updateStrategyProfiles(const std::vector<PlayerProfile> &profiles, Value maxPossibleReward);
 
-        std::vector<PlayerProfile> pickStrategiesWithWeights(const std::vector<std::vector<StratWeight>> &weights);
+        std::vector<PlayerProfile> pickStrategiesWithWeights(const std::vector<std::vector<StratWeight>> &weights) const;
         std::vector<std::vector<StratWeight>> updateWeights(const std::vector<PlayerProfile> &profiles, Value maxPossibleReward);
         std::vector<StratWeight> getStrategyWeights() const;
     };

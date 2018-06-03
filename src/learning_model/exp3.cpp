@@ -31,7 +31,7 @@ namespace learning_model {
         }
     }
 
-    std::vector<PlayerProfile> Exp3::pickStrategiesEvenly(size_t numPlayers) {
+    std::vector<PlayerProfile> Exp3::pickStrategiesEvenly(size_t numPlayers) const {
         std::vector<std::vector<StratWeight>> playerWeights;
         playerWeights.resize(numPlayers);
         for (auto &weights : playerWeights) {
@@ -44,7 +44,7 @@ namespace learning_model {
 
     std::vector<PlayerProfile> Exp3::pickStrategiesWithWeights(
         const std::vector<std::vector<StratWeight>> &weights
-    ) {
+    ) const {
         std::vector<PlayerProfile> profiles;
         static std::random_device *rd = new std::random_device();
         static std::mt19937 gen((*rd)());
@@ -124,7 +124,7 @@ namespace learning_model {
         return weights;
     }
 
-    std::vector<double> Exp3::probabilitiesFromWeights(const std::vector<StratWeight> &weights) {
+    std::vector<double> Exp3::probabilitiesFromWeights(const std::vector<StratWeight> &weights) const {
         std::vector<double> probabilities;
         size_t numStrategies = weights.size();
         assert(numStrategies != 0);
