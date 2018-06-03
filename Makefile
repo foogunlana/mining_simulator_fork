@@ -11,6 +11,7 @@ LDLIBS := -lgsl -lcblas
 # MODULES := learning_model,utils
 SRCS := $(wildcard src/learning_model/*.cpp) $(wildcard src/utils/*.cpp)
 OBJS := $(patsubst %.cpp,%.o,$(SRCS))
+MAIN := src/main.cpp
 
 CATCH_TST := tests/test_main
 TST_SRCS := $(filter-out $(CATCH_TST).cpp, $(wildcard tests/*.cpp))
@@ -23,7 +24,10 @@ $(CATCH_TST).o: $(CATCH_TST).cpp
 	$(CPP) $(CPPFLAGS) $(INC) -c -o $@ $<
 
 test: $(CATCH_TST).o $(OBJS) $(TST_SRCS)
-	$(CPP) $(CPPFLAGS) $(INC) $(LDLIBS) -o $@ $^ && ./test
+	$(CPP) $(CPPFLAGS) $(INC) $(LDLIBS) -o $@ $^ && ./$@
+
+run: $(OBJS) $(MAIN)
+	$(CPP) $(CPPFLAGS) $(INC) $(LDLIBS) -o $@ $^ && ./$@
 
 clean:
 	rm *.o
