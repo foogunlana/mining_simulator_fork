@@ -12,7 +12,7 @@ LDLIBS := -lgsl -lcblas
 SRCS := $(wildcard src/learning_model/*.cpp) $(wildcard src/utils/*.cpp)
 OBJS := $(patsubst %.cpp,%.o,$(SRCS))
 
-CATCH_TST := tests/tests-main
+CATCH_TST := tests/test_main
 TST_SRCS := $(filter-out $(CATCH_TST).cpp, $(wildcard tests/*.cpp))
 TST_OBJS := $(patsubst %.cpp,%.o,$(TST_SRCS))
 
