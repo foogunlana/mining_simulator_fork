@@ -40,6 +40,7 @@ namespace learning_model {
 
         std::vector<PlayerProfile> pickStrategiesWithWeights(const std::vector<std::vector<StratWeight>> &weights);
         std::vector<std::vector<StratWeight>> updateWeights(const std::vector<PlayerProfile> &profiles, Value maxPossibleReward);
+        std::vector<StratWeight> getStrategyWeights() const;
     };
 }
 

@@ -116,6 +116,14 @@ namespace learning_model {
         return newWeights;
     }
 
+    std::vector<StratWeight> Exp3::getStrategyWeights() const {
+        std::vector<StratWeight> weights;
+        for (auto &s : strategies) {
+            weights.push_back(s->weight);
+        }
+        return weights;
+    }
+
     std::vector<double> Exp3::probabilitiesFromWeights(const std::vector<StratWeight> &weights) {
         std::vector<double> probabilities;
         size_t numStrategies = weights.size();
