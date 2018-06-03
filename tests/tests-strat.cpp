@@ -4,38 +4,86 @@
 
 #include <vector>
 #include <string>
+#include <random>
+#include <iostream>
 
 namespace LM = learning_model;
 
 SCENARIO("Exp3 learning model") {
-    double weight1 = 4;
-    double weight2 = 1;
-    auto s1 = std::make_unique<LM::Strategy>("strategy1", weight1);
-    auto s2 = std::make_unique<LM::Strategy>("strategy2", weight2);
+    double weight1(4);
+    double weight2(1);
+    double weight3(5);
+    auto s1(std::make_unique<LM::Strategy>("strategy1", weight1));
+    auto s2(std::make_unique<LM::Strategy>("strategy2", weight2));
+    auto s3(std::make_unique<LM::Strategy>("strategy2", weight3));
+
+    StratWeight total(0);
 
     std::vector<std::unique_ptr<LM::Strategy>> strategies;
     strategies.push_back(std::move(s1));
     strategies.push_back(std::move(s2));
+    strategies.push_back(std::move(s3));
+    for (auto &s : strategies) {
+        total += s->weight;
+    }
+
     size_t numStrategies = strategies.size();
     double phi(.01);
 
-    GIVEN("strategies picked somehow") {
+    GIVEN("strategies picked somehow [pickStrategies*]") {
 
         LM::Exp3 model(strategies, phi);
-        size_t numPlayers = 4;
+        size_t numPlayers(4);
+        std::vector<std::vector<StratWeight>> weights;
+        weights.resize(numPlayers);
+        for (auto &playerWeights : weights) {
+            for (size_t i = 0; i < numStrategies; i++) {
+                playerWeights.push_back(std::rand() % 10);
+            }
+        }
+        std::vector<StratWeight> total2;
+        total2.resize(numPlayers);
+        for (size_t i = 0; i < numPlayers; i++) {
+            for (size_t j = 0; j < numStrategies; j++) {
+                total2[i] += weights[i][j];
+            }
+        }
         std::vector<LM::PlayerProfile> profiles = model.pickStrategiesEvenly(numPlayers);
+        std::vector<LM::PlayerProfile> profiles2 = model.pickStrategiesWithWeights(weights);
 
         // NOTE: should test randomness of strategy picking somehow...
 
         THEN("returns player profiles with no rewards") {
-            for (size_t i = 0; i < numPlayers - 1; i++) {
+            for (size_t i = 0; i < numPlayers; i++) {
                 REQUIRE(profiles[i].currentReward == 0);
+            }
+            for (size_t i = 0; i < numPlayers; i++) {
+                REQUIRE(profiles2[i].currentReward == 0);
             }
         }
 
         THEN("returns players, each with some strategy") {
-            for (size_t i = 0; i < numPlayers - 1; i++) {
+            for (size_t i = 0; i < numPlayers; i++) {
                 REQUIRE(profiles[i].currentStrategy < numStrategies);
+            }
+            for (size_t i = 0; i < numPlayers; i++) {
+                REQUIRE(profiles2[i].currentStrategy < numStrategies);
+            }
+        }
+
+        THEN("returns correct number of player profiles") {
+            REQUIRE(profiles.size() == numPlayers);
+            REQUIRE(profiles2.size() == numPlayers);
+        }
+
+        THEN("results in original weights but normalised") {
+            for (size_t i = 0; i < numPlayers; i++) {
+                CHECK(profiles[i].weights[0] == weight1 / total);
+                CHECK(profiles[i].weights[1] == weight2 / total);
+                CHECK(profiles[i].weights[2] == weight3 / total);
+                for (size_t j = 0; j < numStrategies; j++) {
+                    REQUIRE(profiles2[i].weights[j] == weights[i][j] / total2[i]);
+                }
             }
         }
     }
@@ -45,18 +93,6 @@ SCENARIO("Exp3 learning model") {
         LM::Exp3 model(strategies, phi);
         size_t numPlayers = 4;
         std::vector<LM::PlayerProfile> profiles = model.pickStrategiesEvenly(numPlayers);
-
-        THEN("returns correct number of player profiles") {
-            REQUIRE(profiles.size() == numPlayers);
-        }
-
-        THEN("results in original normalised weights") {
-            double total = weight1 + weight2;
-            for (size_t i = 0; i < numPlayers - 1; i++) {
-                CHECK(profiles[i].weights[0] == weight1 / total);
-                CHECK(profiles[i].weights[1] == weight2 / total);
-            }
-        }
 
         THEN("results in equal weights") {
             for (size_t i = 0; i < numPlayers - 1; i++) {
@@ -71,17 +107,44 @@ SCENARIO("Exp3 learning model") {
         }
     }
 
-    SECTION("updating weights") {
-        GIVEN("weights start off equal") {
+    GIVEN("strategies picked unevenly [pickStrategiesWithWeights]") {
+        LM::Exp3 model(strategies, phi);
+        size_t numPlayers = 4;
+        std::vector<std::vector<StratWeight>> weights;
+        weights.resize(numPlayers);
+        for (auto &playerWeights : weights) {
+            for (size_t i = 0; i < numStrategies; i++) {
+                playerWeights.push_back(std::rand() % 10);
+            }
+        }
+        std::vector<LM::PlayerProfile> profiles = model.pickStrategiesWithWeights(weights);
+
+        // THEN("")
+        GIVEN("weights start off heavily (1 - 0) biased") {
+            weight1 = 0;
+            weight2 = 0;
+            weight3 = 1;
             auto s1 = std::make_unique<LM::Strategy>("strategy1", weight1);
-            auto s2 = std::make_unique<LM::Strategy>("strategy2", weight1);
+            auto s2 = std::make_unique<LM::Strategy>("strategy2", weight2);
+            auto s3 = std::make_unique<LM::Strategy>("strategy3", weight3);
 
             std::vector<std::unique_ptr<LM::Strategy>> strategies2;
             strategies2.push_back(std::move(s1));
             strategies2.push_back(std::move(s2));
+            strategies2.push_back(std::move(s3));
             double phi(.01);
             LM::Exp3 model2(strategies2, phi);
 
+            THEN("only biased strategy is selected") {
+                std::vector<LM::PlayerProfile> profiles = model.pickStrategiesWithWeights(weights);
+                for (auto &player : profiles) {
+                    std::cout << player.currentStrategy << std::endl;
+                    // REQUIRE(player.currentStrategy == 2);
+                }
+            }
         }
+    }
+
+    SECTION("updating weights") {
     }
 }
