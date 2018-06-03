@@ -92,9 +92,9 @@ namespace learning_model {
             double gHat = normalizedReward / player.probabilities[player.currentStrategy];
             double weightAdjustment = exp((phi * gHat) / numStrategies);
 
-            std::vector<StratWeight> playerWeights = player.weights;
+            std::vector<StratWeight> playerWeights(player.weights);
 
-            StratWeight oldWeight = player.weights[player.currentStrategy];
+            StratWeight oldWeight = playerWeights[player.currentStrategy];
             playerWeights[player.currentStrategy] *= StratWeight(weightAdjustment);
             StratWeight maxWeight = StratWeight(1) - oldWeight + playerWeights[player.currentStrategy];
 
