@@ -165,7 +165,7 @@ SCENARIO("Exp3 learning model") {
         size_t numStrategies = strategies.size();
         double phi(.01);
 
-        GIVEN("even strategies and biased rewards") {
+        GIVEN("even strategies and biased rewards (only one player gets a reward with one strategy)") {
             LM::Exp3 model(strategies, phi);
             std::vector<LM::PlayerProfile> profiles = model.pickStrategiesEvenly(3);
             profiles[0].currentStrategy = 1;
@@ -187,15 +187,24 @@ SCENARIO("Exp3 learning model") {
                 REQUIRE(strategyWeights[1] > strategyWeights[2]);
             }
 
-            THEN("returns biased player weights") {
+            THEN("returns biased player weights (only player with good strategy learns anything)") {
                 Value maxPossibleReward(Value(1));
                 std::vector<std::vector<StratWeight>> weights = model.updateWeights(
                     profiles, maxPossibleReward);
 
-                for (auto &playerWeights : weights) {
-                    REQUIRE(playerWeights[1] > playerWeights[0]);
-                    REQUIRE(playerWeights[1] > playerWeights[2]);
-                }
+                size_t player(0);
+                size_t strategy(1);
+                // increased weights for strategy that was rewarded
+                REQUIRE(weights[player][strategy] > weights[player][0]);
+                REQUIRE(weights[player][strategy] > weights[player][2]);
+                player++;
+                // learned nothing
+                REQUIRE(weights[player][strategy] == weights[player][0]);
+                REQUIRE(weights[player][strategy] == weights[player][2]);
+                player++;
+                // learned nothing
+                REQUIRE(weights[player][strategy] == weights[player][0]);
+                REQUIRE(weights[player][strategy] == weights[player][2]);
             }
         }
     }
