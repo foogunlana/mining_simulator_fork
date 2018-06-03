@@ -85,6 +85,7 @@ namespace learning_model {
 
         std::vector<std::vector<StratWeight>> newWeights;
 
+        // NOTE: Maybe throw an error if the max reward is less than any reward
         for (auto &player : playerProfiles) {
             double rewardRatio = valuePercentage(player.currentReward, maxPossibleReward);
             double normalizedReward(fmin(rewardRatio, 1.0));
