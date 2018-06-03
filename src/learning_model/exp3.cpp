@@ -39,20 +39,26 @@ namespace learning_model {
                 weights.push_back(strategy->weight);
             }
         }
-        return pickStrategiesWithWeights(numPlayers, playerWeights);
+        return pickStrategiesWithWeights(playerWeights);
     }
 
     std::vector<PlayerProfile> Exp3::pickStrategiesWithWeights(
-        size_t numPlayers,
         const std::vector<std::vector<StratWeight>> &weights
     ) {
         std::vector<PlayerProfile> profiles;
         static std::random_device *rd = new std::random_device();
         static std::mt19937 gen((*rd)());
 
+        size_t numPlayers(weights.size());
         for (size_t i = 0; i < numPlayers; i++) {
             auto p = PlayerProfile();
-            p.weights = weights[i];
+            StratWeight totalWeight(0);
+            for (auto w : weights[i]) {
+                totalWeight += w;
+            }
+            for (auto weight : weights[i]) {
+                p.weights.push_back(weight / totalWeight);
+            }
             p.probabilities = probabilitiesFromWeights(p.weights);
             p.currentStrategy = strategyFromProbabilities(gen, p.probabilities);
             p.currentReward = 0;
@@ -61,8 +67,16 @@ namespace learning_model {
         return profiles;
     }
 
+    // for convenience
+    std::vector<PlayerProfile> Exp3::updateStrategyProfiles(
+        const std::vector<PlayerProfile> &playerProfiles,
+        Value maxPossibleReward
+    ) {
+        auto updatedWeights = updateWeights(playerProfiles, maxPossibleReward);
+        return pickStrategiesWithWeights(updatedWeights);
+    }
 
-    std::vector<StratWeight> Exp3::updateWeights(
+    std::vector<std::vector<StratWeight>> Exp3::updateWeights(
         const std::vector<PlayerProfile> &playerProfiles,
         Value maxPossibleReward
     ) {
@@ -99,7 +113,7 @@ namespace learning_model {
             updatedWeights[strategy] /= StratWeight(numPlayers);
             strategies[strategy]->weight = updatedWeights[strategy];
         }
-        return updatedWeights;
+        return newWeights;
     }
 
     std::vector<double> Exp3::probabilitiesFromWeights(const std::vector<StratWeight> &weights) {

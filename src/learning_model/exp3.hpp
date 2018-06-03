@@ -35,11 +35,11 @@ namespace learning_model {
             double phi
         );
 
-        // NOTE: following is api without tests
         std::vector<PlayerProfile> pickStrategiesEvenly(size_t numPlayers);
-        std::vector<PlayerProfile> pickStrategiesWithWeights(
-            size_t numPlayers, const std::vector<std::vector<StratWeight>> &weights);
-        std::vector<StratWeight> updateWeights(const std::vector<PlayerProfile> &profiles, Value maxPossibleReward);
+        std::vector<PlayerProfile> updateStrategyProfiles(const std::vector<PlayerProfile> &profiles, Value maxPossibleReward);
+
+        std::vector<PlayerProfile> pickStrategiesWithWeights(const std::vector<std::vector<StratWeight>> &weights);
+        std::vector<std::vector<StratWeight>> updateWeights(const std::vector<PlayerProfile> &profiles, Value maxPossibleReward);
     };
 }
 
