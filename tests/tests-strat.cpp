@@ -90,6 +90,7 @@ SCENARIO("Exp3 learning model") {
 
     GIVEN("strategies picked evenly [pickStrategiesEvenly]") {
 
+        size_t numStrategies = strategies.size();
         LM::Exp3 model(strategies, phi);
         size_t numPlayers = 4;
         std::vector<LM::PlayerProfile> profiles = model.pickStrategiesEvenly(numPlayers);
@@ -107,40 +108,38 @@ SCENARIO("Exp3 learning model") {
         }
     }
 
-    GIVEN("strategies picked unevenly [pickStrategiesWithWeights]") {
-        LM::Exp3 model(strategies, phi);
-        size_t numPlayers = 4;
-        std::vector<std::vector<StratWeight>> weights;
-        weights.resize(numPlayers);
-        for (auto &playerWeights : weights) {
-            for (size_t i = 0; i < numStrategies; i++) {
-                playerWeights.push_back(std::rand() % 10);
+    GIVEN("weights start off heavily (1 - 0) biased") {
+        weight1 = 0;
+        weight2 = 0;
+        weight3 = 1;
+        auto s1 = std::make_unique<LM::Strategy>("strategy1", weight1);
+        auto s2 = std::make_unique<LM::Strategy>("strategy2", weight2);
+        auto s3 = std::make_unique<LM::Strategy>("strategy3", weight3);
+
+        std::vector<std::unique_ptr<LM::Strategy>> strategies2;
+        strategies2.push_back(std::move(s1));
+        strategies2.push_back(std::move(s2));
+        strategies2.push_back(std::move(s3));
+        double phi(.01);
+        LM::Exp3 model2(strategies2, phi);
+
+        THEN("only biased strategy is selected") {
+            size_t numPlayers = 5;
+            std::vector<LM::PlayerProfile> profiles = model2.pickStrategiesEvenly(numPlayers);
+            for (auto &player : profiles) {
+                REQUIRE(player.currentStrategy == 2);
             }
         }
-        std::vector<LM::PlayerProfile> profiles = model.pickStrategiesWithWeights(weights);
 
-        // THEN("")
-        GIVEN("weights start off heavily (1 - 0) biased") {
-            weight1 = 0;
-            weight2 = 0;
-            weight3 = 1;
-            auto s1 = std::make_unique<LM::Strategy>("strategy1", weight1);
-            auto s2 = std::make_unique<LM::Strategy>("strategy2", weight2);
-            auto s3 = std::make_unique<LM::Strategy>("strategy3", weight3);
-
-            std::vector<std::unique_ptr<LM::Strategy>> strategies2;
-            strategies2.push_back(std::move(s1));
-            strategies2.push_back(std::move(s2));
-            strategies2.push_back(std::move(s3));
-            double phi(.01);
-            LM::Exp3 model2(strategies2, phi);
-
-            THEN("only biased strategy is selected") {
-                std::vector<LM::PlayerProfile> profiles = model.pickStrategiesWithWeights(weights);
-                for (auto &player : profiles) {
-                    std::cout << player.currentStrategy << std::endl;
-                    // REQUIRE(player.currentStrategy == 2);
+        THEN("biased probability is approximately 1 and others are 0") {
+            size_t numPlayers = 3;
+            std::vector<LM::PlayerProfile> profiles = model2.pickStrategiesEvenly(numPlayers);
+            for (auto &player : profiles) {
+                for (size_t strategy = 0; strategy < strategies2.size(); strategy++) {
+                    if (strategy == player.currentStrategy) continue;
+                    REQUIRE(player.probabilities[player.currentStrategy] == 0);
                 }
+                REQUIRE(player.probabilities[player.currentStrategy] == Approx(1).epsilon(0.01));
             }
         }
     }
