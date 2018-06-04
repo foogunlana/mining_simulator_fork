@@ -52,6 +52,7 @@ SCENARIO("Exp3 learning model") {
         std::vector<LM::PlayerProfile> profiles2 = model.pickStrategiesWithWeights(weights);
 
         // NOTE: should test randomness of strategy picking somehow...
+        // NOTE: should test that reward is zero after updating strategies
 
         THEN("returns player profiles with no rewards") {
             for (size_t i = 0; i < numPlayers; i++) {
