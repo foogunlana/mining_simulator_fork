@@ -15,7 +15,6 @@ MAIN := src/main.cpp
 
 CATCH_TST := tests/test_main
 TST_SRCS := $(filter-out $(CATCH_TST).cpp, $(wildcard tests/*.cpp))
-TST_OBJS := $(patsubst %.cpp,%.o,$(TST_SRCS))
 
 %.o: %.cpp
 	$(CPP) $(CPPFLAGS) $(INC) -c -o $@ $<
@@ -30,6 +29,6 @@ run: $(OBJS) $(MAIN)
 	$(CPP) $(CPPFLAGS) $(INC) $(LDLIBS) -o $@ $^ && ./$@
 
 clean:
-	rm *.o
+	rm -f $(OBJS) test run
 
-.PHONY: clean test
+.PHONY: clean test run
