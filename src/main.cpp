@@ -6,6 +6,9 @@
 
 #include "src/learning_model/exp3.hpp"
 #include "src/learning_model/strategy.hpp"
+#include "src/mining_game/miner.hpp"
+#include "src/mining_game/miner_group.hpp"
+#include "src/mining_game/game.hpp"
 
 #include <vector>
 #include <iostream>
@@ -15,23 +18,13 @@
 //0.13533528323661 = 1/(e^2)
 
 namespace LM = learning_model;
-
-struct BlockchainSettings {
-    BlockRate secondsPerBlock;
-    ValueRate transactionFeeRate;
-    BlockValue blockReward;
-    BlockCount numberOfBlocks;
-};
-
-struct GameSettings {
-    BlockchainSettings blockchainSettings;
-};
+namespace MG = mining_game;
 
 struct RunSettings {
     unsigned int numberOfGames;
     MinerCount totalMiners;
     MinerCount fixedDefault;
-    GameSettings gameSettings;
+    MG::GameSettings gameSettings;
     std::string folderPrefix;
 };
 
@@ -60,18 +53,22 @@ void run(RunSettings settings) {
     learningStrategies.push_back(std::make_unique<LM::Strategy>(strategyNames[1], defaultWeight));
 
     //start running games
-    BlockCount totalBlocksMined(0);
-    BlockCount blocksInLongestChain(0);
-
-    // std::vector<std::unique_ptr<Miner>> miners;
-    // std::vector<Miner *> learningMiners;
+    // BlockCount totalBlocksMined(0);
+    // BlockCount blocksInLongestChain(0);
     HashRate hashRate(1.0/rawCount(settings.totalMiners));
+
+    std::vector<std::unique_ptr<MG::Miner>> miners;
+    MG::MinerParameters parameters {rawCount(1), "test", hashRate};
+    miners.push_back(std::make_unique<MG::Miner>(parameters, "strategy1"));
+
+    // std::vector<MG::Miner *> learningMiners;
     MinerCount numberRandomMiners(settings.totalMiners - settings.fixedDefault);
+
 
     for (MinerCount i = 0; i < settings.totalMiners; i++) {
         auto minerName = std::to_string(rawCount(i));
         // MinerParameters parameters {rawCount(i), minerName, hashRate};
-        // miners.push_back(std::make_unique<Miner>(parameters, *defaultStrategy));
+        // miners.push_back(std::make_unique<MG::Miner>(parameters, *defaultStrategy));
         // if (i < numberRandomMiners) {
         //     learningMiners.push_back(miners.back().get());
         // }
@@ -85,13 +82,22 @@ void run(RunSettings settings) {
     // MinerGroup minerGroup(std::move(miners));
     // auto blockchain = std::make_unique<Blockchain>(settings.gameSettings.blockchainSettings);
 
+    MG::MinerGroup minerGroup(std::move(miners));
+    MG::Game game(settings.gameSettings);
+
     for (unsigned int gameNum = 0; gameNum < settings.numberOfGames; gameNum++) {
+        // something like
+        // for (size_t i = 0; i < miners.size(); i++) {
+        //     miners[i].setStrategy(learningStrategies[minerProfiles.currentStrategy])
+        // }
+
+        auto results = game.run(minerGroup);
 
         // blockchain->reset(settings.gameSettings.blockchainSettings);
-        for (size_t strategy = 0; strategy < strategyWeights.size(); strategy++) {
-            std::cout << strategyNames[strategy] << "->" << strategyWeights[strategy] << "  ||  ";
-        }
-        std::cout << std::endl;
+        // for (size_t strategy = 0; strategy < strategyWeights.size(); strategy++) {
+        //     std::cout << strategyNames[strategy] << "->" << strategyWeights[strategy] << "  ||  ";
+        // }
+        // std::cout << std::endl;
 
         // model->writeWeights(gameNum);
         // minerGroup.reset(*blockchain);
@@ -106,10 +112,10 @@ void run(RunSettings settings) {
         //     minerProfiles[miner].currentReward = result[miner].reward;
         // }
 
-        Value maxProfit = calculateMaxProfit(settings);
+        // Value maxProfit = calculateMaxProfit(settings);
 
         // Steps 3, 4, 5
-        minerProfiles = model.updateStrategyProfiles(minerProfiles, maxProfit);
+        // minerProfiles = model.updateStrategyProfiles(minerProfiles, maxProfit);
     }
     // model->writeWeights(settings.numberOfGames);
 }
@@ -121,15 +127,15 @@ int main(int, const char * []) {
     BlockValue blockReward(0 * satoshiPerBitcoin); // BLOCK_REWARD
     BlockValue transactionFeeRate((50 * satoshiPerBitcoin)/expectedTimeToFindBlock);  //TRANSACTION_FEE_RATE
 
-    BlockchainSettings blockchainSettings = {
+    MG::BlockchainSettings blockchainSettings = {
         expectedTimeToFindBlock,
         transactionFeeRate,
         blockReward,
         expectedNumberOfBlocks
     };
-    GameSettings gameSettings = {blockchainSettings};
+    MG::GameSettings gameSettings = {blockchainSettings};
 
-    RunSettings runSettings = {100, MinerCount(200), MinerCount(0), gameSettings, "test"};
+    RunSettings runSettings = {1, MinerCount(200), MinerCount(0), gameSettings, "test"};
     run(runSettings);
 
 }
