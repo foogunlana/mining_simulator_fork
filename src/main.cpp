@@ -36,9 +36,6 @@ struct RunSettings {
 };
 
 Value calculateMaxProfit(RunSettings settings);
-void runStratGame(
-    RunSettings settings, std::vector<std::unique_ptr<LM::Strategy>> &learningStrategies,
-    std::unique_ptr<LM::Strategy> defaultStrategy);
 void run(RunSettings settings);
 
 Value calculateMaxProfit(RunSettings settings) {
@@ -51,10 +48,17 @@ Value calculateMaxProfit(RunSettings settings) {
     return transactionFeesTaken / Value(rawCount(settings.totalMiners) / 4);
 }
 
-void runStratGame(
-    RunSettings settings, std::vector<std::unique_ptr<LM::Strategy>> &learningStrategies,
-    std::unique_ptr<LM::Strategy> defaultStrategy
-) {
+void run(RunSettings settings) {
+
+    std::vector<std::unique_ptr<LM::Strategy>> learningStrategies;
+    StratWeight defaultWeight(1);
+
+    std::unique_ptr<LM::Strategy> defaultStrategy(std::make_unique<LM::Strategy>("default", defaultWeight));
+
+    std::vector<std::string> strategyNames{"petty", "lazy-fork"};
+    learningStrategies.push_back(std::make_unique<LM::Strategy>(strategyNames[0], defaultWeight));
+    learningStrategies.push_back(std::make_unique<LM::Strategy>(strategyNames[1], defaultWeight));
+
     //start running games
     BlockCount totalBlocksMined(0);
     BlockCount blocksInLongestChain(0);
@@ -85,15 +89,14 @@ void runStratGame(
 
         // blockchain->reset(settings.gameSettings.blockchainSettings);
         for (size_t strategy = 0; strategy < strategyWeights.size(); strategy++) {
-            std::cout << strategy << " " << strategyWeights[strategy] << " | ";
+            std::cout << strategyNames[strategy] << "->" << strategyWeights[strategy] << "  ||  ";
         }
         std::cout << std::endl;
 
         // model->writeWeights(gameNum);
         // minerGroup.reset(*blockchain);
         // for (size_t i = 0; i < learningMiners.size(); i++) {
-            // something like miners[i]->changeStrategy(
-            //    learningStrategies[minerProfiles[i].currentStrategy)
+            // something like miners[i]->changeStrategy(minerProfiles[i].currentStrategy)
         // }
         // minerGroup.resetOrder();
 
@@ -111,18 +114,6 @@ void runStratGame(
     // model->writeWeights(settings.numberOfGames);
 }
 
-void run(RunSettings settings) {
-
-    std::vector<std::unique_ptr<LM::Strategy>> learningStrategies;
-    StratWeight defaultWeight(1);
-
-    std::unique_ptr<LM::Strategy> defaultStrategy(std::make_unique<LM::Strategy>("default", defaultWeight));
-    learningStrategies.push_back(std::make_unique<LM::Strategy>("petty", defaultWeight));
-    learningStrategies.push_back(std::make_unique<LM::Strategy>("lazy-fork", defaultWeight));
-
-    runStratGame(settings, learningStrategies, std::move(defaultStrategy));
-}
-
 int main(int, const char * []) {
     Value satoshiPerBitcoin(100000000); // search SATOSHI_PER_BITCOIN in original project
     BlockCount expectedNumberOfBlocks(10000); // EXPECTED_NUMBER_OF_BLOCKS
@@ -138,7 +129,7 @@ int main(int, const char * []) {
     };
     GameSettings gameSettings = {blockchainSettings};
 
-    RunSettings runSettings = {1000, MinerCount(200), MinerCount(0), gameSettings, "test"};
+    RunSettings runSettings = {100, MinerCount(200), MinerCount(0), gameSettings, "test"};
     run(runSettings);
 
 }
