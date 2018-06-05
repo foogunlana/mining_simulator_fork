@@ -1,7 +1,6 @@
 //
 //  main.cpp
 //
-//  Created by Foluso (Bo) Ogunlana
 //
 
 #include "src/learning_model/exp3.hpp"

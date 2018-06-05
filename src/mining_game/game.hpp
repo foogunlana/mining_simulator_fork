@@ -10,15 +10,9 @@
 #include "src/utils/typeDefs.hpp"
 #include "game_result.hpp"
 #include "miner_group.hpp"
+#include "blockchain_settings.hpp"
 
 namespace mining_game {
-
-    struct BlockchainSettings {
-        BlockRate secondsPerBlock;
-        ValueRate transactionFeeRate;
-        BlockValue blockReward;
-        BlockCount numberOfBlocks;
-    };
 
     struct GameSettings {
         BlockchainSettings blockchainSettings;
@@ -26,7 +20,7 @@ namespace mining_game {
 
     class Game {
     private:
-        GameSettings settings;
+        BlockchainSettings blockchainSettings;
     public:
         Game(GameSettings settings);
         GameResult run(MinerGroup &minerGroup);

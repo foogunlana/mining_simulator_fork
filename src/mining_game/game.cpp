@@ -1,21 +1,34 @@
 //
 //  game.cpp
-//  BlockSim
 //
-//  Created by Harry Kalodner on 6/6/16.
-//  Copyright © 2016 Harry Kalodner. All rights reserved.
 //
 
 #include "miner_group.hpp"
 #include "game.hpp"
 #include "game_result.hpp"
+#include "blockchain.hpp"
+#include "blockchain_settings.hpp"
 
 
 namespace mining_game {
 
-    Game::Game(GameSettings settings_): settings(settings_) {}
+    Game::Game(GameSettings settings_): blockchainSettings(settings_.blockchainSettings) {}
 
     GameResult Game::run(MinerGroup &minerGroup) {
+
+        Blockchain blockchain = Blockchain(blockchainSettings);
+        BlockTime duration = blockchainSettings.numberOfBlocks * blockchainSettings.secondsPerBlock;
+
+        BlockTime currentTime, nextEventTime;
+
+        do {
+            currentTime = blockchain.getTime();
+            nextEventTime = minerGroup.nextEventTime(currentTime);
+            blockchain.advanceToTime(nextEventTime);
+
+            
+        } while (nextEventTime < duration);
+
         return GameResult();
     }
 }

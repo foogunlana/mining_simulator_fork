@@ -12,4 +12,8 @@
 namespace mining_game {
 
     MinerGroup::MinerGroup(std::vector<std::unique_ptr<Miner>> miners_) : miners(std::move(miners_)) {}
+
+    BlockTime MinerGroup::nextEventTime(BlockTime time) {
+        return BlockTime(1) + time;
+    }
 }

@@ -17,6 +17,8 @@ namespace mining_game {
     public:
         MinerGroup(std::vector<std::unique_ptr<Miner>> miners);
         const std::vector<std::unique_ptr<Miner>> miners;
+
+        BlockTime nextEventTime(BlockTime time);
     };
 }
 
