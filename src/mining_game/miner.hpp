@@ -10,12 +10,12 @@
 #define miner_hpp
 
 #include "src/utils/typeDefs.hpp"
+#include "blockchain.hpp"
+#include "block.hpp"
 
 #include <string>
-
-// #include <queue>
+#include <queue>
 // #include <memory>
-
 
 namespace mining_game {
 
@@ -30,11 +30,20 @@ namespace mining_game {
     class Miner {
     private:
         // std::reference_wrapper<const Strategy> strategy;
+        std::vector<std::unique_ptr<Block>> unbroadcastBlocks;
         std::string strategy;
+        Blockchain *blockchain;
+
+        Value totalMiningCost;
+        BlockTime _nextMiningTime;
     public:
         const MinerParameters params;
         // Miner(MinerParameters parameters, const Strategy &strategy);
         Miner(MinerParameters parameters, const std::string strategy);
+
+        void workOn(Blockchain &blockchain);
+        BlockTime nextMiningTime() const;
+        Block mine();
     };
 }
 

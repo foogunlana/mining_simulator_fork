@@ -23,10 +23,10 @@ namespace mining_game {
 
         do {
             currentTime = blockchain.getTime();
-            nextEventTime = minerGroup.nextEventTime(currentTime);
-            blockchain.advanceToTime(nextEventTime);
+            nextEventTime = minerGroup.nextEventTime();
+            // blockchain.advanceToTime(nextEventTime);
 
-            
+
         } while (nextEventTime < duration);
 
         return GameResult();
