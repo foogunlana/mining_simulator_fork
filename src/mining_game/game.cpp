@@ -17,7 +17,7 @@ namespace mining_game {
 
     GameResult Game::run(MinerGroup &minerGroup, Blockchain &blockchain) {
 
-        BlockTime duration = blockchainSettings.numberOfBlocks * blockchainSettings.secondsPerBlock;
+        BlockTime endTime = blockchainSettings.numberOfBlocks * blockchainSettings.secondsPerBlock;
         BlockTime currentTime, nextEventTime;
 
         minerGroup.workOn(blockchain);
@@ -29,7 +29,7 @@ namespace mining_game {
             // blockchain.advanceToTime(nextEventTime);
 
 
-        } while (nextEventTime < duration);
+        } while (nextEventTime < endTime);
 
         return GameResult();
     }
