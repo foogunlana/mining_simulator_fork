@@ -19,10 +19,10 @@ SCENARIO("Exp3 learning model") {
 
     StratWeight total(0);
 
-    std::vector<std::unique_ptr<LM::Strategy>> strategies;
-    strategies.push_back(std::move(s1));
-    strategies.push_back(std::move(s2));
-    strategies.push_back(std::move(s3));
+    std::vector<LM::Strategy *> strategies;
+    strategies.push_back(s1.get());
+    strategies.push_back(s2.get());
+    strategies.push_back(s3.get());
     for (auto &s : strategies) {
         total += s->weight;
     }
@@ -117,10 +117,10 @@ SCENARIO("Exp3 learning model") {
         auto s2 = std::make_unique<LM::Strategy>("strategy2", weight2);
         auto s3 = std::make_unique<LM::Strategy>("strategy3", weight3);
 
-        std::vector<std::unique_ptr<LM::Strategy>> strategies2;
-        strategies2.push_back(std::move(s1));
-        strategies2.push_back(std::move(s2));
-        strategies2.push_back(std::move(s3));
+        std::vector<LM::Strategy *> strategies2;
+        strategies2.push_back(s1.get());
+        strategies2.push_back(s2.get());
+        strategies2.push_back(s3.get());
         double phi(.01);
         LM::Exp3 model2(strategies2, phi);
 
@@ -140,7 +140,9 @@ SCENARIO("Exp3 learning model") {
             for (auto &player : profiles) {
                 for (size_t strategy = 0; strategy < strategies2.size(); strategy++) {
                     if (strategy == biasedStrategy) continue;
-                    REQUIRE(player.probabilities[biasedStrategy] == 0);
+                    REQUIRE(player.probabilities[strategy]+1 == Approx(1).epsilon(0.01));
+                    // NOTE: +1 because Catch 2 library uses % error for epsilon. 0.01 = 1% but 1% of 0 is 0!!!
+                    // See https://github.com/catchorg/Catch2/blob/master/docs/assertions.md#epsilon-example
                 }
                 REQUIRE(player.probabilities[biasedStrategy] == Approx(1).epsilon(0.01));
             }
@@ -155,10 +157,10 @@ SCENARIO("Exp3 learning model") {
 
         StratWeight total(0);
 
-        std::vector<std::unique_ptr<LM::Strategy>> strategies;
-        strategies.push_back(std::move(s1));
-        strategies.push_back(std::move(s2));
-        strategies.push_back(std::move(s3));
+        std::vector<LM::Strategy *> strategies;
+        strategies.push_back(s1.get());
+        strategies.push_back(s2.get());
+        strategies.push_back(s3.get());
         for (auto &s : strategies) {
             total += s->weight;
         }
