@@ -23,8 +23,8 @@ namespace mining_game {
         std::vector<Miner *> miningQueue;
 
         void reset();
-        BlockTime nextEventTime() const;
-        std::vector<Block> mine(BlockTime currentTime);
+        BlockTime nextTimeBlockFound() const;
+        std::vector<Block> mine(BlockTime untilTime);
         void workOn(Blockchain &chain);
     };
 }

@@ -43,7 +43,7 @@ namespace mining_game {
 
         void workOn(Blockchain *blockchain);
         BlockTime nextMiningTime() const;
-        Block mine();
+        Block mine(BlockTime untilTime);
     };
 }
 

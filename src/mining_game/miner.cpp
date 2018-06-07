@@ -8,6 +8,7 @@
 #include "src/utils/typeDefs.hpp"
 
 #include <string>
+#include <random>
 
 constexpr auto maxTime = BlockTime(std::numeric_limits<BlockTime>::max());
 
@@ -24,7 +25,7 @@ namespace mining_game {
     void Miner::workOn(Blockchain *blockchain_) {
         blockchain = blockchain_;
         // _nextMiningTime = strategy.nextMiningTime(*this);
-        _nextMiningTime = blockchain->getTime() + BlockTime(1);
+        _nextMiningTime = blockchain->getTime() + BlockTime(1) + (std::rand() % 100) / 100.0;
     }
 
     BlockTime Miner::nextMiningTime() const {
@@ -32,8 +33,8 @@ namespace mining_game {
         return _nextMiningTime;
     }
 
-    Block Miner::mine() {
-        _nextMiningTime = blockchain->getTime() + BlockTime(1);
+    Block Miner::mine(BlockTime untilTime) {
+        _nextMiningTime = untilTime + BlockTime(1) + (std::rand() % 100) / 100.0;
         return Block();
     }
 }

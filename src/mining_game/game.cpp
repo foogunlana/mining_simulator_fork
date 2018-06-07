@@ -18,18 +18,16 @@ namespace mining_game {
     GameResult Game::run(MinerGroup &minerGroup, Blockchain &blockchain) {
 
         BlockTime endTime = blockchainSettings.numberOfBlocks * blockchainSettings.secondsPerBlock;
-        BlockTime currentTime, nextEventTime;
+        BlockTime currentTime;
 
         minerGroup.workOn(blockchain);
 
         do {
-            currentTime = blockchain.getTime();
-            nextEventTime = minerGroup.nextEventTime();
-            std::cout << nextEventTime << std::endl;
-            // blockchain.advanceToTime(nextEventTime);
+            currentTime = minerGroup.nextTimeBlockFound();
+            std::vector<Block> blocks = minerGroup.mine(currentTime);
+            // std::cout << currentTime << std::endl;
 
-
-        } while (nextEventTime < endTime);
+        } while (currentTime < endTime);
 
         return GameResult();
     }

@@ -53,19 +53,16 @@ namespace mining_game {
         }
     }
 
-    BlockTime MinerGroup::nextEventTime() const {
+    BlockTime MinerGroup::nextTimeBlockFound() const {
         return miningQueue.front()->nextMiningTime();
     }
 
-    std::vector<Block> MinerGroup::mine(BlockTime currentTime) {
-        assert(miningQueue.front()->nextMiningTime() >= currentTime);
-
+    std::vector<Block> MinerGroup::mine(BlockTime untilTime) {
         std::vector<Block> blocksFound;
-        while (miningQueue.front()->nextMiningTime() == currentTime) {
-
+        while (miningQueue.front()->nextMiningTime() == untilTime) {
             std::pop_heap(begin(miningQueue), end(miningQueue), miningSort);
             Miner *miner = miningQueue.back();
-            auto block = miner->mine();
+            auto block = miner->mine(untilTime);
             blocksFound.push_back(block);
             std::push_heap(begin(miningQueue), end(miningQueue), miningSort);
         }
