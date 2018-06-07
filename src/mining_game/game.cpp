@@ -15,18 +15,15 @@ namespace mining_game {
 
     Game::Game(GameSettings settings_): blockchainSettings(settings_.blockchainSettings) {}
 
-    GameResult Game::run(MinerGroup &minerGroup) {
+    GameResult Game::run(MinerGroup &minerGroup, Blockchain &blockchain) {
 
-        auto blockchain = std::make_unique<Blockchain>(blockchainSettings);
         BlockTime duration = blockchainSettings.numberOfBlocks * blockchainSettings.secondsPerBlock;
-
         BlockTime currentTime, nextEventTime;
-        for (auto &miner: minerGroup.miners) {
-            miner->workOn(blockchain.get());
-        }
+
+        minerGroup.workOn(blockchain);
 
         do {
-            currentTime = blockchain->getTime();
+            currentTime = blockchain.getTime();
             nextEventTime = minerGroup.nextEventTime();
             std::cout << nextEventTime << std::endl;
             // blockchain.advanceToTime(nextEventTime);

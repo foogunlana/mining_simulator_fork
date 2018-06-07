@@ -9,6 +9,7 @@
 #include "src/utils/typeDefs.hpp"
 #include "miner.hpp"
 #include "block.hpp"
+#include "blockchain.hpp"
 
 #include <vector>
 
@@ -24,6 +25,7 @@ namespace mining_game {
         void reset();
         BlockTime nextEventTime() const;
         std::vector<Block> mine(BlockTime currentTime);
+        void workOn(Blockchain &chain);
     };
 }
 

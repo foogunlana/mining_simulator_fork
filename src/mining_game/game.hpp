@@ -23,7 +23,7 @@ namespace mining_game {
         BlockchainSettings blockchainSettings;
     public:
         Game(GameSettings settings);
-        GameResult run(MinerGroup &minerGroup);
+        GameResult run(MinerGroup &minerGroup, Blockchain &blockchain);
     };
 }
 

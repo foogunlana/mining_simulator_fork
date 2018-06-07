@@ -14,7 +14,7 @@ constexpr auto maxTime = BlockTime(std::numeric_limits<BlockTime>::max());
 namespace mining_game {
 
     Miner::Miner(MinerParameters params_, const std::string strategy_) :
-        strategy(strategy_), params(params_), blockchain(nullptr)
+        strategy(strategy_), blockchain(nullptr), params(params_)
     {
         unbroadcastBlocks.clear();
         _nextMiningTime = maxTime;

@@ -47,6 +47,12 @@ namespace mining_game {
         return std::make_unique<MinerGroup>(std::move(miners));
     }
 
+    void MinerGroup::workOn(Blockchain &chain) {
+        for (auto &miner: miners) {
+            miner->workOn(&chain);
+        }
+    }
+
     BlockTime MinerGroup::nextEventTime() const {
         return miningQueue.front()->nextMiningTime();
     }

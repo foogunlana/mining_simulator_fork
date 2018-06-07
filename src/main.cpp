@@ -8,6 +8,7 @@
 #include "src/mining_game/miner.hpp"
 #include "src/mining_game/miner_group.hpp"
 #include "src/mining_game/game.hpp"
+#include "src/mining_game/blockchain.hpp"
 
 #include <vector>
 #include <iostream>
@@ -66,10 +67,8 @@ void run(RunSettings settings) {
     std::vector<LM::PlayerProfile> minerProfiles = model.pickStrategiesEvenly(numberRandomMiners);
     std::vector<StratWeight> strategyWeights = model.getStrategyWeights();
 
-    // MinerGroup minerGroup(std::move(miners));
-    // auto blockchain = std::make_unique<Blockchain>(settings.gameSettings.blockchainSettings);
-
-    std::unique_ptr<MG::MinerGroup> minerGroup = MG::MinerGroup::build(settings.totalMiners);
+    auto blockchain = std::make_unique<MG::Blockchain>(settings.gameSettings.blockchainSettings);
+    auto minerGroup = MG::MinerGroup::build(settings.totalMiners);
     MG::Game game(settings.gameSettings);
 
     for (unsigned int gameNum = 0; gameNum < settings.numberOfGames; gameNum++) {
@@ -78,7 +77,7 @@ void run(RunSettings settings) {
         //     miners[i].setStrategy(learningStrategies[minerProfiles.currentStrategy])
         // }
 
-        auto results = game.run(*minerGroup.get());
+        auto results = game.run(*minerGroup.get(), *blockchain.get());
 
         // blockchain->reset(settings.gameSettings.blockchainSettings);
         // for (size_t strategy = 0; strategy < strategyWeights.size(); strategy++) {
