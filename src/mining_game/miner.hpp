@@ -41,7 +41,7 @@ namespace mining_game {
         // Miner(MinerParameters parameters, const Strategy &strategy);
         Miner(MinerParameters parameters, const std::string strategy);
 
-        void workOn(Blockchain &blockchain);
+        void workOn(Blockchain *blockchain);
         BlockTime nextMiningTime() const;
         Block mine();
     };

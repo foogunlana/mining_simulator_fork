@@ -9,6 +9,7 @@
 #include "blockchain.hpp"
 #include "blockchain_settings.hpp"
 
+#include <iostream>
 
 namespace mining_game {
 
@@ -16,14 +17,18 @@ namespace mining_game {
 
     GameResult Game::run(MinerGroup &minerGroup) {
 
-        Blockchain blockchain = Blockchain(blockchainSettings);
+        auto blockchain = std::make_unique<Blockchain>(blockchainSettings);
         BlockTime duration = blockchainSettings.numberOfBlocks * blockchainSettings.secondsPerBlock;
 
         BlockTime currentTime, nextEventTime;
+        for (auto &miner: minerGroup.miners) {
+            miner->workOn(blockchain.get());
+        }
 
         do {
-            currentTime = blockchain.getTime();
+            currentTime = blockchain->getTime();
             nextEventTime = minerGroup.nextEventTime();
+            std::cout << nextEventTime << std::endl;
             // blockchain.advanceToTime(nextEventTime);
 
 

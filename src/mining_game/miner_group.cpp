@@ -35,6 +35,18 @@ namespace mining_game {
         std::make_heap(begin(miningQueue), end(miningQueue), miningSort);
     }
 
+    std::unique_ptr<MinerGroup> MinerGroup::build(MinerCount totalMiners) {
+        std::vector<std::unique_ptr<Miner>> miners;
+        HashRate hashRate(1.0/rawCount(totalMiners));
+
+        for (MinerCount i = 0; i < totalMiners; i++) {
+            auto minerName = std::to_string(rawCount(i));
+            MinerParameters parameters {rawCount(i), minerName, hashRate};
+            miners.push_back(std::make_unique<Miner>(parameters, "strategy2"));
+        }
+        return std::make_unique<MinerGroup>(std::move(miners));
+    }
+
     BlockTime MinerGroup::nextEventTime() const {
         return miningQueue.front()->nextMiningTime();
     }

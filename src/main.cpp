@@ -54,34 +54,17 @@ void run(RunSettings settings) {
     //start running games
     // BlockCount totalBlocksMined(0);
     // BlockCount blocksInLongestChain(0);
-    HashRate hashRate(1.0/rawCount(settings.totalMiners));
-
-    std::vector<std::unique_ptr<MG::Miner>> miners;
-    MG::MinerParameters parameters {rawCount(1), "test", hashRate};
-    miners.push_back(std::make_unique<MG::Miner>(parameters, "strategy1"));
-
-    // std::vector<MG::Miner *> learningMiners;
-    MinerCount numberRandomMiners(settings.totalMiners - settings.fixedDefault);
-
-
-    for (MinerCount i = 0; i < settings.totalMiners; i++) {
-        auto minerName = std::to_string(rawCount(i));
-        // MinerParameters parameters {rawCount(i), minerName, hashRate};
-        // miners.push_back(std::make_unique<MG::Miner>(parameters, *defaultStrategy));
-        // if (i < numberRandomMiners) {
-        //     learningMiners.push_back(miners.back().get());
-        // }
-    }
 
     double phi = .01;
     LM::Exp3 model = LM::Exp3(learningStrategies, phi);
+    MinerCount numberRandomMiners(settings.totalMiners - settings.fixedDefault);
     std::vector<LM::PlayerProfile> minerProfiles = model.pickStrategiesEvenly(numberRandomMiners);
     std::vector<StratWeight> strategyWeights = model.getStrategyWeights();
 
     // MinerGroup minerGroup(std::move(miners));
     // auto blockchain = std::make_unique<Blockchain>(settings.gameSettings.blockchainSettings);
 
-    MG::MinerGroup minerGroup(std::move(miners));
+    std::unique_ptr<MG::MinerGroup> minerGroup = MG::MinerGroup::build(settings.totalMiners);
     MG::Game game(settings.gameSettings);
 
     for (unsigned int gameNum = 0; gameNum < settings.numberOfGames; gameNum++) {
@@ -90,7 +73,7 @@ void run(RunSettings settings) {
         //     miners[i].setStrategy(learningStrategies[minerProfiles.currentStrategy])
         // }
 
-        auto results = game.run(minerGroup);
+        auto results = game.run(*minerGroup.get());
 
         // blockchain->reset(settings.gameSettings.blockchainSettings);
         // for (size_t strategy = 0; strategy < strategyWeights.size(); strategy++) {
