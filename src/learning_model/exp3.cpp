@@ -14,9 +14,9 @@ namespace learning_model {
     size_t strategyFromProbabilities(std::mt19937 gen, std::vector<double> &probabilities);
 
     Exp3::Exp3(
-        std::vector<std::unique_ptr<Strategy>> &strategies_,
+        const std::vector<Strategy *> strategies_,
         double phi_) :
-        strategies(std::move(strategies_)),
+        strategies(strategies_),
         phi(phi_)
     {
         assert(strategies.size() > 0);

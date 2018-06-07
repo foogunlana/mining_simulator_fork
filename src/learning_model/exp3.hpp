@@ -25,13 +25,13 @@ namespace learning_model {
 
     class Exp3 {
     private:
-        std::vector<std::unique_ptr<Strategy>> strategies;
+        const std::vector<Strategy *> strategies;
         const double phi;
 
         std::vector<double> probabilitiesFromWeights(const std::vector<StratWeight> &weights) const;
     public:
         Exp3(
-            std::vector<std::unique_ptr<Strategy>>& strategies,
+            const std::vector<Strategy *> strategies,
             double phi
         );
 

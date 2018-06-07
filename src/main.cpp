@@ -55,8 +55,13 @@ void run(RunSettings settings) {
     // BlockCount totalBlocksMined(0);
     // BlockCount blocksInLongestChain(0);
 
+    std::vector<LM::Strategy *> expLearningStrategies;
+    for(auto &s: learningStrategies) {
+        expLearningStrategies.push_back(s.get());
+    }
+
     double phi = .01;
-    LM::Exp3 model = LM::Exp3(learningStrategies, phi);
+    LM::Exp3 model = LM::Exp3(expLearningStrategies, phi);
     MinerCount numberRandomMiners(settings.totalMiners - settings.fixedDefault);
     std::vector<LM::PlayerProfile> minerProfiles = model.pickStrategiesEvenly(numberRandomMiners);
     std::vector<StratWeight> strategyWeights = model.getStrategyWeights();
