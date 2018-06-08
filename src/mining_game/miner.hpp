@@ -33,7 +33,6 @@ namespace mining_game {
         // std::reference_wrapper<const Strategy> strategy;
         std::vector<std::unique_ptr<Block>> unbroadcastBlocks;
         std::string strategy;
-        Blockchain *blockchain;
 
         Value totalMiningCost;
         BlockTime _nextMiningTime;
@@ -42,9 +41,9 @@ namespace mining_game {
         // Miner(MinerParameters parameters, const Strategy &strategy);
         Miner(MinerParameters parameters, const std::string strategy);
 
-        void workOn(Blockchain *blockchain);
+        void start(const Blockchain & chain);
         BlockTime nextMiningTime() const;
-        std::unique_ptr<Block> mine();
+        std::unique_ptr<Block> mine(Blockchain &chain);
     };
 }
 

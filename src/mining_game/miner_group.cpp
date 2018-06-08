@@ -50,7 +50,7 @@ namespace mining_game {
 
     void MinerGroup::workOn(Blockchain &chain) {
         for (auto &miner: miners) {
-            miner->workOn(&chain);
+            miner->start(chain);
         }
     }
 
@@ -58,17 +58,17 @@ namespace mining_game {
         return miningQueue.front()->nextMiningTime();
     }
 
-    void MinerGroup::mine(Blockchain & blockchain, BlockTime now) {
+    void MinerGroup::mine(Blockchain & chain, BlockTime now) {
         std::vector<std::unique_ptr<Block>> blocksFound;
         while (miningQueue.front()->nextMiningTime() == now) {
             std::pop_heap(begin(miningQueue), end(miningQueue), miningSort);
             Miner *miner = miningQueue.back();
-            auto block = miner->mine();
+            auto block = miner->mine(chain);
             blocksFound.push_back(std::move(block));
             std::push_heap(begin(miningQueue), end(miningQueue), miningSort);
         }
         for (auto &b : blocksFound) {
-            blockchain.addBlock(std::move(b));
+            chain.addBlock(std::move(b));
         }
     }
 

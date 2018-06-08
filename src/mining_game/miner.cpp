@@ -17,17 +17,14 @@ constexpr auto maxTime = BlockTime(std::numeric_limits<BlockTime>::max());
 namespace mining_game {
 
     Miner::Miner(MinerParameters params_, const std::string strategy_) :
-        strategy(strategy_), blockchain(nullptr), params(params_)
+        strategy(strategy_), params(params_)
     {
-        unbroadcastBlocks.clear();
         _nextMiningTime = maxTime;
         totalMiningCost = 0;
     }
 
-    void Miner::workOn(Blockchain *blockchain_) {
-        blockchain = blockchain_;
-        // _nextMiningTime = strategy.nextMiningTime(*this);
-        _nextMiningTime = blockchain->getTime() + BlockTime(1) + (std::rand() % 100) / 100.0;
+    void Miner::start(const Blockchain & chain) {
+        _nextMiningTime = chain.getTime() + BlockTime(1) + utils::selectMiningOffset(chain.chanceToWin(params.hashRate));
     }
 
     BlockTime Miner::nextMiningTime() const {
@@ -35,11 +32,11 @@ namespace mining_game {
         return _nextMiningTime;
     }
 
-    std::unique_ptr<Block> Miner::mine() {
+    std::unique_ptr<Block> Miner::mine(Blockchain &chain) {
         // this should maybe be in the strategy
         // whenToMine and chooseParent
-        _nextMiningTime += BlockTime(1) + utils::selectMiningOffset(blockchain->chanceToWin(params.hashRate));
-        Block *parent = blockchain->frontier()[0].get();
+        _nextMiningTime += BlockTime(1) + utils::selectMiningOffset(chain.chanceToWin(params.hashRate));
+        Block *parent = chain.frontier()[0].get();
         return std::make_unique<Block>(parent);
     }
 }
