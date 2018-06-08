@@ -8,7 +8,6 @@
 
 #include "src/utils/typeDefs.hpp"
 
-class Block;
 
 namespace mining_game {
     struct MinerResult {

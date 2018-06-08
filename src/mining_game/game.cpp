@@ -8,6 +8,8 @@
 #include "game_result.hpp"
 #include "blockchain.hpp"
 #include "blockchain_settings.hpp"
+#include "block.hpp"
+
 
 #include <iostream>
 
@@ -20,12 +22,14 @@ namespace mining_game {
         BlockTime endTime = blockchainSettings.numberOfBlocks * blockchainSettings.secondsPerBlock;
         BlockTime currentTime;
 
+        auto genesis = std::make_unique<Block>();
+        blockchain.addBlock(std::move(genesis));
         minerGroup.workOn(blockchain);
 
         do {
             currentTime = minerGroup.nextTimeBlockFound();
-            std::vector<Block> blocks = minerGroup.mine(currentTime);
-            // std::cout << currentTime << std::endl;
+            minerGroup.mine(blockchain, currentTime);
+            std::cout << currentTime << '\n';
 
         } while (currentTime < endTime);
 

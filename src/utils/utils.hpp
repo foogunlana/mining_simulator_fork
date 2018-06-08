@@ -18,7 +18,7 @@ namespace utils {
     std::size_t selectRandomIndex(size_t size);
     double selectRandomChance();
     BlockTime selectMiningOffset(TimeRate mean);
-    
+
     Value valWithNoise(Value minVal, Value maxVal);
 }
 

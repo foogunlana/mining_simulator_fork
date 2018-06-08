@@ -9,6 +9,7 @@
 #include "miner_group.hpp"
 #include "miner.hpp"
 #include "block.hpp"
+#include "blockchain.hpp"
 #include "src/utils/typeDefs.hpp"
 
 #include <limits>
@@ -57,16 +58,18 @@ namespace mining_game {
         return miningQueue.front()->nextMiningTime();
     }
 
-    std::vector<Block> MinerGroup::mine(BlockTime untilTime) {
-        std::vector<Block> blocksFound;
+    void MinerGroup::mine(Blockchain & blockchain, BlockTime untilTime) {
+        std::vector<std::unique_ptr<Block>> blocksFound;
         while (miningQueue.front()->nextMiningTime() == untilTime) {
             std::pop_heap(begin(miningQueue), end(miningQueue), miningSort);
             Miner *miner = miningQueue.back();
             auto block = miner->mine(untilTime);
-            blocksFound.push_back(block);
+            blocksFound.push_back(std::move(block));
             std::push_heap(begin(miningQueue), end(miningQueue), miningSort);
         }
-        return blocksFound;
+        for (auto &b : blocksFound) {
+            blockchain.addBlock(std::move(b));
+        }
     }
 
 }

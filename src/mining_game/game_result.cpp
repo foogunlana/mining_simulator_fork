@@ -7,7 +7,6 @@
 //
 
 #include "game_result.hpp"
-
 #include "miner_result.hpp"
 
 namespace mining_game {

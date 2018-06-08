@@ -10,7 +10,6 @@
 #define miner_hpp
 
 #include "src/utils/typeDefs.hpp"
-#include "blockchain.hpp"
 #include "block.hpp"
 
 #include <string>
@@ -18,6 +17,8 @@
 // #include <memory>
 
 namespace mining_game {
+
+    class Blockchain;
 
     struct MinerParameters {
         const unsigned int number;
@@ -43,7 +44,7 @@ namespace mining_game {
 
         void workOn(Blockchain *blockchain);
         BlockTime nextMiningTime() const;
-        Block mine(BlockTime untilTime);
+        std::unique_ptr<Block> mine(BlockTime untilTime);
     };
 }
 

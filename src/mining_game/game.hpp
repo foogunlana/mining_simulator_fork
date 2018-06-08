@@ -9,7 +9,6 @@
 
 #include "src/utils/typeDefs.hpp"
 #include "game_result.hpp"
-#include "miner_group.hpp"
 #include "blockchain_settings.hpp"
 
 namespace mining_game {
@@ -17,6 +16,8 @@ namespace mining_game {
     struct GameSettings {
         BlockchainSettings blockchainSettings;
     };
+
+    class MinerGroup;
 
     class Game {
     private:

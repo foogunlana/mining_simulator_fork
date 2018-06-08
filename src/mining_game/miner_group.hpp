@@ -7,13 +7,13 @@
 #define minerGroup_hpp
 
 #include "src/utils/typeDefs.hpp"
-#include "miner.hpp"
-#include "block.hpp"
-#include "blockchain.hpp"
 
 #include <vector>
 
 namespace mining_game {
+
+    class Blockchain;
+    class Miner;
 
     class MinerGroup {
     public:
@@ -24,7 +24,7 @@ namespace mining_game {
 
         void reset();
         BlockTime nextTimeBlockFound() const;
-        std::vector<Block> mine(BlockTime untilTime);
+        void mine(Blockchain & blockchain, BlockTime untilTime);
         void workOn(Blockchain &chain);
     };
 }

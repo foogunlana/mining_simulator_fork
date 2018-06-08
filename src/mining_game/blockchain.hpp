@@ -7,12 +7,14 @@
 #define blockchain_hpp
 
 #include "src/utils/typeDefs.hpp"
-#include "blockchain_settings.hpp"
 
-class Block;
+#include <vector>
 
 
 namespace mining_game {
+
+    class Block;
+    struct BlockchainSettings;
 
     class Blockchain {
     private:
@@ -21,10 +23,14 @@ namespace mining_game {
         BlockRate secondsPerBlock;
         ValueRate transactionFeeRate;
 
-        BlockHeight _maxHeightPub;
+        size_t _maxHeightPub;
+        std::vector<std::vector<std::unique_ptr<Block>>> blocks;
     public:
         Blockchain(BlockchainSettings blockchainSettings);
         void advanceToTime(BlockTime time);
+        void addBlock(std::unique_ptr<Block> block);
+        TimeRate chanceToWin(HashRate hashRate) const;
+        std::vector<std::unique_ptr<Block>> & frontier();
         BlockTime getTime() const;
     };
 }

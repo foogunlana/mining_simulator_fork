@@ -4,8 +4,10 @@
 //
 
 #include "miner.hpp"
+#include "src/utils/utils.hpp"
+
 #include "blockchain.hpp"
-#include "src/utils/typeDefs.hpp"
+#include "block.hpp"
 
 #include <string>
 #include <random>
@@ -33,8 +35,10 @@ namespace mining_game {
         return _nextMiningTime;
     }
 
-    Block Miner::mine(BlockTime untilTime) {
-        _nextMiningTime = untilTime + BlockTime(1) + (std::rand() % 100) / 100.0;
-        return Block();
+    std::unique_ptr<Block> Miner::mine(BlockTime finish) {
+        // this should maybe be in the strategy
+        _nextMiningTime = finish + BlockTime(1) + utils::selectMiningOffset(blockchain->chanceToWin(params.hashRate));
+        Block *parent = blockchain->frontier()[0].get();
+        return std::make_unique<Block>(parent);
     }
 }

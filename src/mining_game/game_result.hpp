@@ -9,9 +9,9 @@
 #include "src/utils/typeDefs.hpp"
 #include "miner_result.hpp"
 
+
 #include <vector>
 
-class Miner;
 
 namespace mining_game {
 
