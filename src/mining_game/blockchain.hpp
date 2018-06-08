@@ -30,7 +30,7 @@ namespace mining_game {
         void advanceToTime(BlockTime time);
         void addBlock(std::unique_ptr<Block> block);
         TimeRate chanceToWin(HashRate hashRate) const;
-        const std::vector<std::unique_ptr<Block>> & frontier();
+        const std::vector<std::unique_ptr<Block>> & frontier() const;
         BlockTime getTime() const;
     };
 }
