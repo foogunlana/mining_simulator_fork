@@ -44,7 +44,7 @@ namespace mining_game {
 
         void workOn(Blockchain *blockchain);
         BlockTime nextMiningTime() const;
-        std::unique_ptr<Block> mine(BlockTime untilTime);
+        std::unique_ptr<Block> mine();
     };
 }
 

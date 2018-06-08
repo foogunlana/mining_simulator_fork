@@ -39,7 +39,7 @@ namespace mining_game {
         blocks[height].push_back(std::move(block));
     }
 
-    std::vector<std::unique_ptr<Block>> & Blockchain::frontier() {
+    const std::vector<std::unique_ptr<Block>> & Blockchain::frontier() {
         return blocks[_maxHeightPub];
     }
 

@@ -35,9 +35,10 @@ namespace mining_game {
         return _nextMiningTime;
     }
 
-    std::unique_ptr<Block> Miner::mine(BlockTime finish) {
+    std::unique_ptr<Block> Miner::mine() {
         // this should maybe be in the strategy
-        _nextMiningTime = finish + BlockTime(1) + utils::selectMiningOffset(blockchain->chanceToWin(params.hashRate));
+        // whenToMine and chooseParent
+        _nextMiningTime += BlockTime(1) + utils::selectMiningOffset(blockchain->chanceToWin(params.hashRate));
         Block *parent = blockchain->frontier()[0].get();
         return std::make_unique<Block>(parent);
     }
