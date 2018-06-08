@@ -12,11 +12,18 @@
 
 namespace learning_model {
 
+    class Behaviour {
+    public:
+        Behaviour();
+    };
+
     class Strategy {
     public:
         std::string name;
         StratWeight weight;
+        const Behaviour *behaviour;
 
+        Strategy(std::string name, StratWeight weight, const Behaviour* behaviour);
         Strategy(std::string name, StratWeight weight);
     };
 }

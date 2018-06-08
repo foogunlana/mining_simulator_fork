@@ -9,6 +9,7 @@
 #include "src/mining_game/miner_group.hpp"
 #include "src/mining_game/game.hpp"
 #include "src/mining_game/blockchain.hpp"
+#include "src/mining_game/default_behaviour.hpp"
 
 #include <vector>
 #include <iostream>
@@ -46,11 +47,12 @@ void run(RunSettings settings) {
     std::vector<std::unique_ptr<LM::Strategy>> learningStrategies;
     StratWeight defaultWeight(1);
 
-    std::unique_ptr<LM::Strategy> defaultStrategy(std::make_unique<LM::Strategy>("default", defaultWeight));
+    auto honest = std::make_unique<MG::DefaultBehaviour>().get();
+    auto defaultStrategy(std::make_unique<LM::Strategy>("default", defaultWeight, honest));
 
     std::vector<std::string> strategyNames{"petty", "lazy-fork"};
-    learningStrategies.push_back(std::make_unique<LM::Strategy>(strategyNames[0], defaultWeight));
-    learningStrategies.push_back(std::make_unique<LM::Strategy>(strategyNames[1], defaultWeight));
+    learningStrategies.push_back(std::make_unique<LM::Strategy>(strategyNames[0], defaultWeight, honest));
+    learningStrategies.push_back(std::make_unique<LM::Strategy>(strategyNames[1], defaultWeight, honest));
 
     //start running games
     // BlockCount totalBlocksMined(0);
@@ -67,7 +69,7 @@ void run(RunSettings settings) {
     std::vector<LM::PlayerProfile> minerProfiles = model.pickStrategiesEvenly(numberRandomMiners);
     std::vector<StratWeight> strategyWeights = model.getStrategyWeights();
 
-    auto minerGroup = MG::MinerGroup::build(settings.totalMiners);
+    auto minerGroup = MG::MinerGroup::build(settings.totalMiners, settings.fixedDefault);
     MG::Game game(settings.gameSettings);
 
     for (unsigned int gameNum = 0; gameNum < settings.numberOfGames; gameNum++) {

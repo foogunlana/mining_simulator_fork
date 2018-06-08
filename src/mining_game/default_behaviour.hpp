@@ -1,6 +1,6 @@
 
-#ifndef default_strategy_hpp
-#define default_strategy_hpp
+#ifndef default_behaviour_hpp
+#define default_behaviour_hpp
 
 #include "src/utils/typeDefs.hpp"
 #include "src/learning_model/strategy.hpp"
@@ -13,9 +13,9 @@ namespace mining_game {
     class Block;
     class Miner;
 
-    class DefaultStrategy : learning_model::Strategy {
+    class DefaultBehaviour : public learning_model::Behaviour {
     public:
-        DefaultStrategy(std::string name, StratWeight weight);
+        DefaultBehaviour();
 
         Block & chooseParent(const Blockchain & chain, const Miner & miner) const;
         // Block & publish(const Blockchain & chain, const & miner) const;

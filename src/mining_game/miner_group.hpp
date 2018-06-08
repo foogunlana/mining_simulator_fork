@@ -17,9 +17,11 @@ namespace mining_game {
 
     class MinerGroup {
     public:
-        MinerGroup(std::vector<std::unique_ptr<Miner>> miners);
-        static std::unique_ptr<MinerGroup> build(MinerCount totalMiners);
+        MinerGroup(std::vector<std::unique_ptr<Miner>> miners, std::vector<Miner *> learningMiners);
+        static std::unique_ptr<MinerGroup> build(MinerCount totalMiners, MinerCount numDefault);
+
         const std::vector<std::unique_ptr<Miner>> miners;
+        const std::vector<Miner *> learningMiners;
         std::vector<Miner *> miningQueue;
 
         void reset();

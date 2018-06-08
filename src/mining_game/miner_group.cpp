@@ -29,23 +29,33 @@ namespace mining_game {
         return miner1Time > miner2Time;
     }
 
-    MinerGroup::MinerGroup(std::vector<std::unique_ptr<Miner>> miners_) : miners(std::move(miners_)) {
+    MinerGroup::MinerGroup(
+        std::vector<std::unique_ptr<Miner>> miners_,
+        std::vector<Miner *> learningMiners_
+    ) : miners(std::move(miners_)), learningMiners(learningMiners_) {
+
         for (auto &miner : miners) {
             miningQueue.push_back(miner.get());
         }
         std::make_heap(begin(miningQueue), end(miningQueue), miningSort);
     }
 
-    std::unique_ptr<MinerGroup> MinerGroup::build(MinerCount totalMiners) {
+    std::unique_ptr<MinerGroup> MinerGroup::build(MinerCount totalMiners, MinerCount numDefault) {
         std::vector<std::unique_ptr<Miner>> miners;
+        std::vector<Miner *> learningMiners;
+
         HashRate hashRate(1.0/rawCount(totalMiners));
+        MinerCount numberRandomMiners(totalMiners - numDefault);
 
         for (MinerCount i = 0; i < totalMiners; i++) {
             auto minerName = std::to_string(rawCount(i));
             MinerParameters parameters {rawCount(i), minerName, hashRate};
             miners.push_back(std::make_unique<Miner>(parameters, "strategy2"));
+            if (i < numberRandomMiners) {
+                learningMiners.push_back(miners.back().get());
+            }
         }
-        return std::make_unique<MinerGroup>(std::move(miners));
+        return std::make_unique<MinerGroup>(std::move(miners), learningMiners);
     }
 
     void MinerGroup::workOn(Blockchain &chain) {
