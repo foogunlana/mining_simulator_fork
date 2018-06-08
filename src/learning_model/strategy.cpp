@@ -12,8 +12,5 @@ namespace learning_model {
     Strategy::Strategy(std::string name_, StratWeight weight_, const Behaviour *behaviour_):
         name(name_), weight(weight_), behaviour(behaviour_) {}
 
-    Strategy::Strategy(std::string name_, StratWeight weight_):
-        name(name_), weight(weight_), behaviour(nullptr) {}
-
     Behaviour::Behaviour() {}
 }

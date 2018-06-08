@@ -24,7 +24,6 @@ namespace learning_model {
         const Behaviour *behaviour;
 
         Strategy(std::string name, StratWeight weight, const Behaviour* behaviour);
-        Strategy(std::string name, StratWeight weight);
     };
 }
 
