@@ -5,6 +5,7 @@
 
 #include "src/learning_model/strategy.hpp"
 #include "src/utils/typeDefs.hpp"
+#include "behaviour.hpp"
 
 #include <string>
 

@@ -8,14 +8,12 @@
 
 #include "src/utils/typeDefs.hpp"
 
+
 #include <string>
 
 namespace learning_model {
 
-    class Behaviour {
-    public:
-        Behaviour();
-    };
+    class Behaviour;
 
     class Strategy {
     public:

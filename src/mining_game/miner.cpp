@@ -38,7 +38,8 @@ namespace mining_game {
         // this should maybe be in the strategy
         // whenToMine and chooseParent
         _nextMiningTime += BlockTime(1) + utils::selectMiningOffset(chain.chanceToWin(params.hashRate));
-        Block *parent = chain.frontier()[0].get();
-        return std::make_unique<Block>(parent);
+        // Block *parent = chain.frontier()[0].get();
+        Block &parent = strategy.behaviour.chooseParent(chain, *this);
+        return std::make_unique<Block>(&parent);
     }
 }

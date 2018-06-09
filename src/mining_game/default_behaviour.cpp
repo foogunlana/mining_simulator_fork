@@ -1,6 +1,9 @@
 
 #include "default_behaviour.hpp"
-#include "src/learning_model/strategy.hpp"
+#include "src/learning_model/behaviour.hpp"
+
+// #include "src/utils/typeDefs.hpp"
+#include "src/utils/utils.hpp"
 
 #include "block.hpp"
 #include "miner.hpp"
@@ -15,7 +18,8 @@ namespace mining_game {
     DefaultBehaviour::DefaultBehaviour() : learning_model::Behaviour() {}
 
     Block & DefaultBehaviour::chooseParent(const Blockchain & chain, const Miner & miner) const {
-        return *chain.frontier().front().get();
+        const std::vector<std::unique_ptr<Block>> & possiblities = chain.frontier();
+        return *possiblities[utils::selectRandomIndex(possiblities.size())].get();
     }
 
     // Block & publish(const Blockchain & chain, const & miner) const {
