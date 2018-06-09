@@ -11,7 +11,7 @@
 
 namespace learning_model {
 
-    size_t strategyFromProbabilities(std::mt19937 gen, std::vector<double> &probabilities);
+    size_t strategyFromProbabilities(std::mt19937 &gen, std::vector<double> &probabilities);
 
     Exp3::Exp3(
         const std::vector<Strategy *> strategies_,
@@ -143,7 +143,7 @@ namespace learning_model {
         return probabilities;
     }
 
-    size_t strategyFromProbabilities(std::mt19937 gen, std::vector<double> &probabilities) {
+    size_t strategyFromProbabilities(std::mt19937 &gen, std::vector<double> &probabilities) {
         std::discrete_distribution<std::size_t> dis(begin(probabilities), end(probabilities));
         size_t stratIndex = dis(gen);
         return stratIndex;
