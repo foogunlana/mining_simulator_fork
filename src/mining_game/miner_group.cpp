@@ -45,8 +45,11 @@ namespace mining_game {
     }
 
     std::unique_ptr<MinerGroup> MinerGroup::build(
-        MinerCount totalMiners, MinerCount numDefault, std::vector<LM::Strategy *> learningStrategies)
-    {
+        MinerCount totalMiners,
+        MinerCount numDefault,
+        std::vector<LM::Strategy *> learningStrategies,
+        LM::Strategy *defaultStrategy
+    ) {
         std::vector<std::unique_ptr<Miner>> miners;
         std::vector<Miner *> learningMiners;
 
@@ -56,7 +59,7 @@ namespace mining_game {
         for (MinerCount i = 0; i < totalMiners; i++) {
             auto minerName = std::to_string(rawCount(i));
             MinerParameters parameters {rawCount(i), minerName, hashRate};
-            miners.push_back(std::make_unique<Miner>(parameters, "strategy2"));
+            miners.push_back(std::make_unique<Miner>(parameters, *defaultStrategy));
             if (i < numberRandomMiners) {
                 learningMiners.push_back(miners.back().get());
             }
@@ -70,8 +73,8 @@ namespace mining_game {
         assert(learningMiners.size() == profiles.size());
 
         for (size_t miner = 0; miner < learningMiners.size(); miner++) {
-            auto strategy = learningStrategies[profiles[miner].currentStrategy];
-            // learningMiners[miner]->changeStrategy(strategy);
+            LM::Strategy *strategy = learningStrategies[profiles[miner].currentStrategy];
+            learningMiners[miner]->changeStrategy(*strategy);
         }
     }
 

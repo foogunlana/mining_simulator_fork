@@ -35,7 +35,8 @@ namespace mining_game {
         static std::unique_ptr<MinerGroup> build(
             MinerCount totalMiners,
             MinerCount numDefault,
-            std::vector<LM::Strategy *> learningStrategies
+            std::vector<LM::Strategy *> learningStrategies,
+            LM::Strategy *defaultStrategy
         );
 
         const std::vector<std::unique_ptr<Miner>> miners;

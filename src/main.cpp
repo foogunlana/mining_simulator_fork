@@ -70,7 +70,10 @@ void run(RunSettings settings) {
     std::vector<LM::PlayerProfile> minerProfiles = model.pickStrategiesEvenly(numberRandomMiners);
 
     auto minerGroup = MG::MinerGroup::build(
-        settings.totalMiners, settings.fixedDefault, expLearningStrategies);
+        settings.totalMiners,
+        settings.fixedDefault,
+        expLearningStrategies,
+        defaultStrategy.get());
 
     // std::vector<StratWeight> strategyWeights = model.getStrategyWeights();
 

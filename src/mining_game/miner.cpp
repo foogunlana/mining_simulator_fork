@@ -19,7 +19,7 @@ namespace LM = learning_model;
 
 namespace mining_game {
 
-    Miner::Miner(MinerParameters params_, const std::string strategy_) :
+    Miner::Miner(MinerParameters params_, LM::Strategy &strategy_) :
         strategy(strategy_), params(params_)
     {
         _nextMiningTime = maxTime;
@@ -35,7 +35,7 @@ namespace mining_game {
         return _nextMiningTime;
     }
 
-    void changeStrategy(LM::Strategy * strategy) {
+    void Miner::changeStrategy(LM::Strategy &strategy) {
 
     }
 
