@@ -75,11 +75,16 @@ void run(RunSettings settings) {
         expLearningStrategies,
         defaultStrategy.get());
 
-    // std::vector<StratWeight> strategyWeights = model.getStrategyWeights();
-
     MG::Game game(settings.gameSettings);
 
     for (unsigned int gameNum = 0; gameNum < settings.numberOfGames; gameNum++) {
+
+        // NOTE: for printing
+        // std::vector<StratWeight> strategyWeights = model.getStrategyWeights();
+
+        // NOTE: for multiple games, take minerGroup and blockchain out of loop and reset them
+        // minerGroup.reset();
+        // blockchain.reset();
 
         minerGroup->updateLearningMinerStrategies(minerProfiles);
         auto blockchain = std::make_unique<MG::Blockchain>(settings.gameSettings.blockchainSettings);
@@ -134,7 +139,7 @@ int main(int, const char * []) {
     };
     MG::GameSettings gameSettings = {blockchainSettings};
 
-    RunSettings runSettings = {1000, MinerCount(200), MinerCount(0), gameSettings, "test"};
+    RunSettings runSettings = {1, MinerCount(200), MinerCount(0), gameSettings, "test"};
     run(runSettings);
 
 }
