@@ -90,38 +90,35 @@ SCENARIO("Exp3 learning model") {
     }
 
     GIVEN("strategies picked evenly [pickStrategiesEvenly]") {
-        double weight1(1);
-        double weight2(1);
-        double weight3(1);
-        auto s1(std::make_unique<LM::Strategy>("strategy1", weight1, nullptr));
-        auto s2(std::make_unique<LM::Strategy>("strategy2", weight2, nullptr));
-        auto s3(std::make_unique<LM::Strategy>("strategy3", weight3, nullptr));
 
-        StratWeight total(0);
-
-        std::vector<LM::Strategy *> strategies;
-        strategies.push_back(s1.get());
-        strategies.push_back(s2.get());
-        strategies.push_back(s3.get());
-
-        for (auto &s : strategies) {
-            total += s->weight;
-        }
-
-        size_t numStrategies = strategies.size();
         LM::Exp3 model(strategies, phi);
-        size_t numPlayers = 1000;
+        size_t numPlayers = 10000;
         std::vector<LM::PlayerProfile> profiles = model.pickStrategiesEvenly(numPlayers);
-        
+
         THEN("uses all strategies") {
-            std::vector<bool> used{false, false, false};
+            size_t numStrategies(strategies.size());
+            std::vector<bool> used(numStrategies);
+            std::fill(used.begin(), used.end(), false);
+
             for (size_t i = 0; i < numPlayers - 1; i++) {
-                std::cout << profiles[i].currentStrategy << std::endl;
                 used[profiles[i].currentStrategy] = true;
             }
-            REQUIRE(used[0] == true);
-            REQUIRE(used[1] == true);
-            REQUIRE(used[2] == true);
+            REQUIRE(used[0]);
+            REQUIRE(used[1]);
+            REQUIRE(used[2]);
+        }
+
+        THEN("strategies are not all the same") {
+            size_t numStrategies(strategies.size());
+            std::vector<bool> used(numStrategies);
+            std::fill(used.begin(), used.end(), false);
+
+            bool same(true);
+            for (size_t i = 0; i < numPlayers - 1; i++) {
+                same = same && (profiles[i].currentStrategy == profiles[i+1].currentStrategy);
+                if (!same) break;
+            }
+            REQUIRE_FALSE(same);
         }
 
         THEN("results in equal weights") {
