@@ -30,11 +30,6 @@ namespace mining_game {
         _nextMiningTime = chain.getTime() + BlockTime(1) + utils::selectMiningOffset(chain.chanceToWin(params.hashRate));
     }
 
-    BlockTime Miner::nextMiningTime() const {
-        // return strategy.nextMiningTime(*this);
-        return _nextMiningTime;
-    }
-
     void Miner::changeStrategy(LM::Strategy &strategy) {
 
     }

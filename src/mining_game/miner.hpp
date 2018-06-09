@@ -48,9 +48,12 @@ namespace mining_game {
         Miner(MinerParameters parameters, LM::Strategy &strategy);
 
         void start(const Blockchain & chain);
-        BlockTime nextMiningTime() const;
         void changeStrategy(LM::Strategy &strategy);
         std::unique_ptr<Block> mine(Blockchain &chain);
+
+        BlockTime nextMiningTime() const {
+            return _nextMiningTime;
+        }
     };
 }
 
