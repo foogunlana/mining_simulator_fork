@@ -48,7 +48,7 @@ void run(RunSettings settings) {
     std::vector<std::unique_ptr<LM::Strategy>> learningStrategies;
     StratWeight defaultWeight(1);
 
-    auto honest = std::make_unique<MG::DefaultBehaviour>().get();
+    auto honest = MG::DefaultBehaviour();
     auto defaultStrategy(std::make_unique<LM::Strategy>("default", defaultWeight, honest));
 
     std::vector<std::string> strategyNames{"petty", "lazy-fork"};
