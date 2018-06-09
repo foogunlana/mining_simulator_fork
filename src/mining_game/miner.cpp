@@ -6,6 +6,7 @@
 #include "miner.hpp"
 #include "src/utils/utils.hpp"
 #include "src/learning_model/strategy.hpp"
+#include "src/learning_model/behaviour.hpp"
 
 #include "blockchain.hpp"
 #include "block.hpp"
@@ -40,6 +41,13 @@ namespace mining_game {
         _nextMiningTime += BlockTime(1) + utils::selectMiningOffset(chain.chanceToWin(params.hashRate));
         // Block *parent = chain.frontier()[0].get();
         Block &parent = strategy.behaviour.chooseParent(chain, *this);
+        // std::cout <<
+        //     "miner" << " " << params.name << " " <<
+        //     "mined on miner" << parent.miner.params.name <<
+        //     "'s block at time " << chain.getTime() << '\n';
+
+        // need to mock out reference to behaviour from strategy to test!!!
+        // else, can't make more complex blocks as the behaviour must do it too
         return std::make_unique<Block>(&parent);
     }
 }
