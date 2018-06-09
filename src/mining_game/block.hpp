@@ -12,7 +12,7 @@ namespace mining_game {
     private:
         size_t _height;
     public:
-        Block(Block * parent_);
+        Block(const Block * parent_);
         Block();
         void hello();
         BlockHeight getHeight() { return _height; }
