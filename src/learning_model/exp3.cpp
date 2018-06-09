@@ -1,5 +1,6 @@
 #include "exp3.hpp"
 #include "strategy.hpp"
+#include "player_profile.hpp"
 
 #include <sstream>
 #include <vector>

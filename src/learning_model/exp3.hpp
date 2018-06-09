@@ -15,13 +15,7 @@
 namespace learning_model {
 
     class Strategy;
-
-    struct PlayerProfile {
-        std::vector<StratWeight> weights;
-        std::vector<double> probabilities;
-        size_t currentStrategy;
-        Value currentReward;
-    };
+    struct PlayerProfile;
 
     class Exp3 {
     private:

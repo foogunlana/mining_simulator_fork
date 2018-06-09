@@ -11,6 +11,8 @@
 #include "block.hpp"
 #include "blockchain.hpp"
 #include "src/utils/typeDefs.hpp"
+#include "src/learning_model/strategy.hpp"
+#include "src/learning_model/player_profile.hpp"
 
 #include <limits>
 #include <cassert>
@@ -18,6 +20,7 @@
 
 // constexpr auto maxTime = BlockTime(std::numeric_limits<BlockTime>::max());
 
+namespace LM = learning_model;
 
 namespace mining_game {
 
@@ -31,8 +34,9 @@ namespace mining_game {
 
     MinerGroup::MinerGroup(
         std::vector<std::unique_ptr<Miner>> miners_,
-        std::vector<Miner *> learningMiners_
-    ) : miners(std::move(miners_)), learningMiners(learningMiners_) {
+        std::vector<Miner *> learningMiners_,
+        std::vector<LM::Strategy *> learningStrategies_
+    ) :  learningStrategies(learningStrategies_), miners(std::move(miners_)), learningMiners(learningMiners_) {
 
         for (auto &miner : miners) {
             miningQueue.push_back(miner.get());
@@ -40,7 +44,9 @@ namespace mining_game {
         std::make_heap(begin(miningQueue), end(miningQueue), miningSort);
     }
 
-    std::unique_ptr<MinerGroup> MinerGroup::build(MinerCount totalMiners, MinerCount numDefault) {
+    std::unique_ptr<MinerGroup> MinerGroup::build(
+        MinerCount totalMiners, MinerCount numDefault, std::vector<LM::Strategy *> learningStrategies)
+    {
         std::vector<std::unique_ptr<Miner>> miners;
         std::vector<Miner *> learningMiners;
 
@@ -55,7 +61,18 @@ namespace mining_game {
                 learningMiners.push_back(miners.back().get());
             }
         }
-        return std::make_unique<MinerGroup>(std::move(miners), learningMiners);
+
+        return std::make_unique<MinerGroup>(
+            std::move(miners), learningMiners, learningStrategies);
+    }
+
+    void MinerGroup::updateLearningMinerStrategies(const std::vector<LM::PlayerProfile> & profiles) {
+        assert(learningMiners.size() == profiles.size());
+
+        for (size_t miner = 0; miner < learningMiners.size(); miner++) {
+            auto strategy = learningStrategies[profiles[miner].currentStrategy];
+            // learningMiners[miner]->changeStrategy(strategy);
+        }
     }
 
     void MinerGroup::workOn(Blockchain &chain) {

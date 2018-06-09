@@ -5,6 +5,7 @@
 
 #include "src/learning_model/exp3.hpp"
 #include "src/learning_model/strategy.hpp"
+#include "src/learning_model/player_profile.hpp"
 #include "src/mining_game/miner.hpp"
 #include "src/mining_game/miner_group.hpp"
 #include "src/mining_game/game.hpp"
@@ -67,19 +68,26 @@ void run(RunSettings settings) {
     LM::Exp3 model = LM::Exp3(expLearningStrategies, phi);
     MinerCount numberRandomMiners(settings.totalMiners - settings.fixedDefault);
     std::vector<LM::PlayerProfile> minerProfiles = model.pickStrategiesEvenly(numberRandomMiners);
-    std::vector<StratWeight> strategyWeights = model.getStrategyWeights();
 
-    auto minerGroup = MG::MinerGroup::build(settings.totalMiners, settings.fixedDefault);
+    auto minerGroup = MG::MinerGroup::build(
+        settings.totalMiners, settings.fixedDefault, expLearningStrategies);
+
+    // std::vector<StratWeight> strategyWeights = model.getStrategyWeights();
+
     MG::Game game(settings.gameSettings);
 
     for (unsigned int gameNum = 0; gameNum < settings.numberOfGames; gameNum++) {
-        // something like
-        // for (size_t i = 0; i < miners.size(); i++) {
-        //     miners[i].setStrategy(learningStrategies[minerProfiles.currentStrategy])
-        // }
 
+        minerGroup->updateLearningMinerStrategies(minerProfiles);
         auto blockchain = std::make_unique<MG::Blockchain>(settings.gameSettings.blockchainSettings);
         auto results = game.run(*minerGroup.get(), *blockchain.get());
+
+        // something like :
+        // assert(results.minerResults.size() == minerProfiles.size());
+        // for (size_t i = 0; i < results.size(); i++) {
+        //     minerProfiles.currentReward = results.minerResults[i].profit;
+        // }
+        // minerProfiles = model.updateStrategyProfiles(minerProfiles, maxProfit);
 
         // blockchain->reset(settings.gameSettings.blockchainSettings);
         // for (size_t strategy = 0; strategy < strategyWeights.size(); strategy++) {

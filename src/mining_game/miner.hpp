@@ -16,6 +16,12 @@
 #include <queue>
 // #include <memory>
 
+namespace learning_model {
+    class Strategy;
+}
+
+namespace LM = learning_model;
+
 namespace mining_game {
 
     class Blockchain;
@@ -43,6 +49,7 @@ namespace mining_game {
 
         void start(const Blockchain & chain);
         BlockTime nextMiningTime() const;
+        void changeStrategy(LM::Strategy * strategy);
         std::unique_ptr<Block> mine(Blockchain &chain);
     };
 }

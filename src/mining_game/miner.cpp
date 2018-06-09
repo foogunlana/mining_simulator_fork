@@ -5,6 +5,7 @@
 
 #include "miner.hpp"
 #include "src/utils/utils.hpp"
+#include "src/learning_model/strategy.hpp"
 
 #include "blockchain.hpp"
 #include "block.hpp"
@@ -13,6 +14,8 @@
 #include <random>
 
 constexpr auto maxTime = BlockTime(std::numeric_limits<BlockTime>::max());
+
+namespace LM = learning_model;
 
 namespace mining_game {
 
@@ -30,6 +33,10 @@ namespace mining_game {
     BlockTime Miner::nextMiningTime() const {
         // return strategy.nextMiningTime(*this);
         return _nextMiningTime;
+    }
+
+    void changeStrategy(LM::Strategy * strategy) {
+
     }
 
     std::unique_ptr<Block> Miner::mine(Blockchain &chain) {
