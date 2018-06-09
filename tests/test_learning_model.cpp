@@ -3,6 +3,7 @@
 #include "src/learning_model/strategy.hpp"
 
 #include <vector>
+#include <map>
 #include <string>
 #include <random>
 #include <iostream>
@@ -119,6 +120,25 @@ SCENARIO("Exp3 learning model") {
                 if (!same) break;
             }
             REQUIRE_FALSE(same);
+        }
+
+        THEN("strategies are allocated proportionally") {
+            size_t numStrategies(strategies.size());
+            std::map<size_t, unsigned int> used;
+
+            double stratTotal(0);
+            for (auto &s: strategies) {
+                stratTotal += s->weight;
+            }
+
+            for (size_t i = 0; i < numPlayers - 1; i++) {
+                used[profiles[i].currentStrategy] += 1;
+            }
+
+            for (size_t i = 0; i < numStrategies - 1; i++) {
+                auto proportion = strategies[i]->weight/stratTotal;
+                CHECK(proportion == Approx((double) used[i]/numPlayers).epsilon(0.1));
+            }
         }
 
         THEN("results in equal weights") {
