@@ -12,12 +12,15 @@
 namespace LM = learning_model;
 
 SCENARIO("Exp3 learning model") {
+
     double weight1(4);
     double weight2(1);
     double weight3(5);
-    auto s1(std::make_unique<LM::Strategy>("strategy1", weight1, nullptr));
-    auto s2(std::make_unique<LM::Strategy>("strategy2", weight2, nullptr));
-    auto s3(std::make_unique<LM::Strategy>("strategy2", weight3, nullptr));
+    auto placeholderBehaviour = LM::Behaviour();
+
+    auto s1(std::make_unique<LM::Strategy>("strategy1", weight1, placeholderBehaviour));
+    auto s2(std::make_unique<LM::Strategy>("strategy2", weight2, placeholderBehaviour));
+    auto s3(std::make_unique<LM::Strategy>("strategy2", weight3, placeholderBehaviour));
 
     StratWeight total(0);
 
@@ -159,9 +162,9 @@ SCENARIO("Exp3 learning model") {
         weight1 = 0;
         weight2 = 0;
         weight3 = 1;
-        auto s1 = std::make_unique<LM::Strategy>("strategy1", weight1, nullptr);
-        auto s2 = std::make_unique<LM::Strategy>("strategy2", weight2, nullptr);
-        auto s3 = std::make_unique<LM::Strategy>("strategy3", weight3, nullptr);
+        auto s1 = std::make_unique<LM::Strategy>("strategy1", weight1, placeholderBehaviour);
+        auto s2 = std::make_unique<LM::Strategy>("strategy2", weight2, placeholderBehaviour);
+        auto s3 = std::make_unique<LM::Strategy>("strategy3", weight3, placeholderBehaviour);
 
         std::vector<LM::Strategy *> strategies2;
         strategies2.push_back(s1.get());
@@ -197,9 +200,9 @@ SCENARIO("Exp3 learning model") {
 
     SECTION("updating weights [updateWeights]") {
         double weight1(4);
-        auto s1(std::make_unique<LM::Strategy>("strategy1", weight1, nullptr));
-        auto s2(std::make_unique<LM::Strategy>("strategy2", weight1, nullptr));
-        auto s3(std::make_unique<LM::Strategy>("strategy3", weight1, nullptr));
+        auto s1(std::make_unique<LM::Strategy>("strategy1", weight1, placeholderBehaviour));
+        auto s2(std::make_unique<LM::Strategy>("strategy2", weight1, placeholderBehaviour));
+        auto s3(std::make_unique<LM::Strategy>("strategy3", weight1, placeholderBehaviour));
 
         StratWeight total(0);
 
