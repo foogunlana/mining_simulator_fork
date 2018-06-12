@@ -23,8 +23,6 @@ namespace mining_game {
         BlockRate secondsPerBlock;
         ValueRate transactionFeeRate;
 
-        Value txPool;
-
         size_t _maxHeightPub;
         std::vector<std::vector<std::unique_ptr<Block>>> blocks;
     public:
@@ -36,7 +34,6 @@ namespace mining_game {
         const std::vector<std::unique_ptr<Block>> & frontier() const;
 
         BlockTime getTime() const { return timeInSecs; };
-        Value getTxPool() const { return txPool; };
     };
 }
 

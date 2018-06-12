@@ -28,6 +28,7 @@ namespace mining_game {
 
         do {
             currentTime = minerGroup.nextTimeBlockFound();
+            blockchain.advanceToTime(currentTime);
             minerGroup.mine(blockchain, currentTime);
             // std::cout << currentTime << '\n';
 
