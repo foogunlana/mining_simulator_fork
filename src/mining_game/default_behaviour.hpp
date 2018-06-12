@@ -18,10 +18,10 @@ namespace mining_game {
     public:
         DefaultBehaviour();
 
-        virtual Block & chooseParent(const Blockchain & chain, const Miner & miner) const;
+        Block & chooseParent(const Blockchain & chain, const Miner & miner) const override;
         // Block & publish(const Blockchain & chain, const & miner) const;
-        virtual Value collectFees(const Blockchain & chain, const Block & block, const Miner & miner) const;
-        virtual Value payForward(const Blockchain & chain, const Block & block, Value fees, const Miner & miner) const;
+        Value collectFees(const Blockchain & chain, const Block & block, const Miner & miner) const override;
+        Value payForward(const Blockchain & chain, const Block & block, Value fees, const Miner & miner) const override;
     };
 }
 
