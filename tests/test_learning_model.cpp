@@ -3,14 +3,6 @@
 #include "src/learning_model/strategy.hpp"
 #include "src/learning_model/player_profile.hpp"
 
-// all because of behaviour mock!
-#include "src/learning_model/behaviour.hpp"
-#include "src/mining_game/block.hpp"
-#include "src/mining_game/blockchain.hpp"
-#include "src/mining_game/miner.hpp"
-#include "src/utils/typeDefs.hpp"
-// ends here
-
 #include <vector>
 #include <map>
 #include <string>
@@ -20,32 +12,13 @@
 namespace LM = learning_model;
 namespace MG = mining_game;
 
-class MockBehaviour : public learning_model::Behaviour {
-public:
-    MockBehaviour();
-    virtual MG::Block & chooseParent(const MG::Blockchain & chain, const MG::Miner & miner) const;
-    virtual Value collectFees(const MG::Blockchain & chain, const MG::Block & block, const MG::Miner & miner) const;
-    virtual Value payForward(const MG::Blockchain & chain, const MG::Block & block, Value fees, const MG::Miner & miner) const;
-};
-
-MockBehaviour::MockBehaviour() : learning_model::Behaviour() {}
-MG::Block & MockBehaviour::chooseParent(const MG::Blockchain & chain, const MG::Miner & miner) const {
-    return *(new MG::Block());
-}
-Value MockBehaviour::collectFees(const MG::Blockchain & chain, const MG::Block & block, const MG::Miner & miner) const {
-    return Value(0);
-}
-Value MockBehaviour::payForward(const MG::Blockchain & chain, const MG::Block & block, Value fees, const MG::Miner & miner) const {
-    return Value(0);
-}
-
-
 SCENARIO("Exp3 learning model") {
 
     double weight1(4);
     double weight2(1);
     double weight3(5);
-    auto placeholderBehaviour = MockBehaviour();
+
+    auto placeholderBehaviour = nullptr;
 
     auto s1(std::make_unique<LM::Strategy>("strategy1", weight1, placeholderBehaviour));
     auto s2(std::make_unique<LM::Strategy>("strategy2", weight2, placeholderBehaviour));
