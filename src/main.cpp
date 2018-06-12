@@ -48,12 +48,12 @@ void run(RunSettings settings) {
     std::vector<std::unique_ptr<LM::Strategy>> learningStrategies;
     StratWeight defaultWeight(1);
 
-    auto honest = MG::DefaultBehaviour();
-    auto defaultStrategy(std::make_unique<LM::Strategy>("default", defaultWeight, honest));
+    auto honest = std::make_unique<MG::DefaultBehaviour>();
+    auto defaultStrategy(std::make_unique<LM::Strategy>("default", defaultWeight, honest.get()));
 
     std::vector<std::string> strategyNames{"petty", "lazy-fork"};
-    learningStrategies.push_back(std::make_unique<LM::Strategy>(strategyNames[0], defaultWeight, honest));
-    learningStrategies.push_back(std::make_unique<LM::Strategy>(strategyNames[1], defaultWeight, honest));
+    learningStrategies.push_back(std::make_unique<LM::Strategy>(strategyNames[0], defaultWeight, honest.get()));
+    learningStrategies.push_back(std::make_unique<LM::Strategy>(strategyNames[1], defaultWeight, honest.get()));
 
     //start running games
     // BlockCount totalBlocksMined(0);

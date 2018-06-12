@@ -17,6 +17,8 @@ namespace learning_model {
     class Behaviour {
     public:
         Behaviour();
+        virtual ~Behaviour() =default;
+
         virtual MG::Block & chooseParent(
             const MG::Blockchain & chain,
             const MG::Miner & miner

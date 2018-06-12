@@ -29,7 +29,7 @@ namespace mining_game {
         do {
             currentTime = minerGroup.nextTimeBlockFound();
             minerGroup.mine(blockchain, currentTime);
-            std::cout << currentTime << '\n';
+            // std::cout << currentTime << '\n';
 
         } while (currentTime < endTime);
 

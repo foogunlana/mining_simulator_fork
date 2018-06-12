@@ -10,7 +10,6 @@
 #include <iostream>
 
 namespace LM = learning_model;
-namespace MG = mining_game;
 
 SCENARIO("Exp3 learning model") {
 

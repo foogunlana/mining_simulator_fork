@@ -40,7 +40,7 @@ namespace mining_game {
         // whenToMine and chooseParent
         _nextMiningTime += BlockTime(1) + utils::selectMiningOffset(chain.chanceToWin(params.hashRate));
         // Block *parent = chain.frontier()[0].get();
-        Block &parent = strategy.behaviour.chooseParent(chain, *this);
+        Block &parent = strategy.behaviour->chooseParent(chain, *this);
         // std::cout <<
         //     "miner" << " " << params.name << " " <<
         //     "mined on miner" << parent.miner.params.name <<
