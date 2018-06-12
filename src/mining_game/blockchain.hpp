@@ -23,15 +23,20 @@ namespace mining_game {
         BlockRate secondsPerBlock;
         ValueRate transactionFeeRate;
 
+        Value txPool;
+
         size_t _maxHeightPub;
         std::vector<std::vector<std::unique_ptr<Block>>> blocks;
     public:
         Blockchain(BlockchainSettings blockchainSettings);
+
         void advanceToTime(BlockTime time);
         void addBlock(std::unique_ptr<Block> block);
         TimeRate chanceToWin(HashRate hashRate) const;
         const std::vector<std::unique_ptr<Block>> & frontier() const;
-        BlockTime getTime() const;
+
+        BlockTime getTime() const { return timeInSecs; };
+        Value getTxPool() const { return txPool; };
     };
 }
 

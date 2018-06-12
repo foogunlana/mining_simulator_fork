@@ -29,10 +29,6 @@ namespace mining_game {
         timeInSecs = time;
     }
 
-    BlockTime Blockchain::getTime() const {
-        return timeInSecs;
-    }
-
     void Blockchain::addBlock(std::unique_ptr<Block> block) {
         size_t height = block->getHeight();
         _maxHeightPub = height > _maxHeightPub ? height : _maxHeightPub;
