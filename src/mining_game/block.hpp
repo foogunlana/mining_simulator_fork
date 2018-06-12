@@ -8,13 +8,18 @@
 
 namespace mining_game {
 
+    class Miner;
+
     class Block {
     private:
         size_t _height;
     public:
-        Block(const Block * parent_);
+        const Miner * miner;
+        const Block * parent;
+
+        Block(const Block * parent, const Miner * miner);
         Block();
-        void hello();
+
         BlockHeight getHeight() { return _height; }
     };
 }

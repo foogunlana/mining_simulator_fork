@@ -13,6 +13,7 @@
 
 #include <string>
 #include <random>
+#include <iostream>
 
 constexpr auto maxTime = BlockTime(std::numeric_limits<BlockTime>::max());
 
@@ -36,18 +37,14 @@ namespace mining_game {
     }
 
     std::unique_ptr<Block> Miner::mine(Blockchain &chain) {
+        Block &parent = strategy.behaviour->chooseParent(chain, *this);
+
         // this should maybe be in the strategy
         // whenToMine and chooseParent
         _nextMiningTime += BlockTime(1) + utils::selectMiningOffset(chain.chanceToWin(params.hashRate));
-        // Block *parent = chain.frontier()[0].get();
-        Block &parent = strategy.behaviour->chooseParent(chain, *this);
-        // std::cout <<
-        //     "miner" << " " << params.name << " " <<
-        //     "mined on miner" << parent.miner.params.name <<
-        //     "'s block at time " << chain.getTime() << '\n';
 
         // need to mock out reference to behaviour from strategy to test!!!
         // else, can't make more complex blocks as the behaviour must do it too
-        return std::make_unique<Block>(&parent);
+        return std::make_unique<Block>(&parent, this);
     }
 }
