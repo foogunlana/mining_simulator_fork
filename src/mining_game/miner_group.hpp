@@ -36,7 +36,8 @@ namespace mining_game {
             MinerCount totalMiners,
             MinerCount numDefault,
             std::vector<LM::Strategy *> learningStrategies,
-            LM::Strategy *defaultStrategy
+            LM::Strategy *defaultStrategy,
+            const Blockchain &chain
         );
 
         const std::vector<std::unique_ptr<Miner>> miners;
@@ -46,7 +47,6 @@ namespace mining_game {
         void reset();
         BlockTime nextTimeBlockFound() const;
         void mine(Blockchain & blockchain, BlockTime untilTime);
-        void workOn(Blockchain &chain);
         void updateLearningMinerStrategies(const std::vector<LM::PlayerProfile> & strategyProfiles);
     };
 }

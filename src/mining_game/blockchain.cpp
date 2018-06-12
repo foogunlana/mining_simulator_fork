@@ -6,6 +6,7 @@
 #include "blockchain.hpp"
 #include "blockchain_settings.hpp"
 #include "block.hpp"
+#include "src/utils/utils.hpp"
 
 #include <iostream>
 
@@ -24,6 +25,22 @@ namespace mining_game {
         // reset(blockchainSettings);
     }
 
+    Block &Blockchain::winningHead() const {
+        Value largestValue(0);
+        for (auto &block : blocks[rawHeight(getMaxHeightPub())]) {
+            largestValue = std::max(largestValue, block->valueInChain);
+        }
+
+        std::vector<Block *> possiblities;
+        for (auto &block : blocks[rawHeight(getMaxHeightPub())]) {
+            if (block->valueInChain == largestValue) {
+                possiblities.push_back(block.get());
+            }
+        }
+        std::uniform_int_distribution<std::size_t> vectorDis(0, possiblities.size() - 1);
+        return *possiblities[utils::selectRandomIndex(possiblities.size())];
+    }
+
     void Blockchain::advanceToTime(BlockTime time) {
         valueNetworkTotal += transactionFeeRate * (time - timeInSecs);
         timeInSecs = time;
@@ -33,6 +50,10 @@ namespace mining_game {
         size_t height = block->getHeight();
         _maxHeightPub = height > _maxHeightPub ? height : _maxHeightPub;
         blocks[height].push_back(std::move(block));
+    }
+
+    Value Blockchain::txPooled(BlockTime period) const {
+        return period * transactionFeeRate;
     }
 
     const std::vector<std::unique_ptr<Block>> & Blockchain::frontier() const {

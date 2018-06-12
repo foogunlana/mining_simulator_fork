@@ -30,10 +30,14 @@ namespace mining_game {
 
         void advanceToTime(BlockTime time);
         void addBlock(std::unique_ptr<Block> block);
+
+        Block &winningHead() const;
+        Value txPooled(BlockTime period) const;
         TimeRate chanceToWin(HashRate hashRate) const;
         const std::vector<std::unique_ptr<Block>> & frontier() const;
 
         BlockTime getTime() const { return timeInSecs; };
+        BlockTime getMaxHeightPub() const { return _maxHeightPub; };
     };
 }
 

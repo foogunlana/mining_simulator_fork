@@ -24,15 +24,18 @@ namespace mining_game {
 
         auto genesis = std::make_unique<Block>();
         blockchain.addBlock(std::move(genesis));
-        minerGroup.workOn(blockchain);
+
+        int counter(0);
 
         do {
             currentTime = minerGroup.nextTimeBlockFound();
             blockchain.advanceToTime(currentTime);
             minerGroup.mine(blockchain, currentTime);
             // std::cout << currentTime << '\n';
-
+            counter++;
         } while (currentTime < endTime);
+
+        // Block &winningBlock = blockchain.winningHead();
 
         return GameResult();
     }

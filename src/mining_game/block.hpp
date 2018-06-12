@@ -16,8 +16,13 @@ namespace mining_game {
     public:
         const Miner * miner;
         const Block * parent;
+        const BlockTime minedAt;
+        const Value txFees;
+        const Value surplus;
 
-        Block(const Block * parent, const Miner * miner);
+        Value valueInChain;
+
+        Block(const Block * parent, const Miner * miner, const BlockTime minedAt, const Value txFees, const Value surplus);
         Block();
 
         BlockHeight getHeight() { return _height; }

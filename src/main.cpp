@@ -69,11 +69,13 @@ void run(RunSettings settings) {
     MinerCount numberRandomMiners(settings.totalMiners - settings.fixedDefault);
     std::vector<LM::PlayerProfile> minerProfiles = model.pickStrategiesEvenly(numberRandomMiners);
 
+    auto blockchain = std::make_unique<MG::Blockchain>(settings.gameSettings.blockchainSettings);
     auto minerGroup = MG::MinerGroup::build(
         settings.totalMiners,
         settings.fixedDefault,
         expLearningStrategies,
-        defaultStrategy.get());
+        defaultStrategy.get(),
+        *blockchain.get());
 
     MG::Game game(settings.gameSettings);
 
@@ -87,7 +89,6 @@ void run(RunSettings settings) {
         // blockchain.reset();
 
         minerGroup->updateLearningMinerStrategies(minerProfiles);
-        auto blockchain = std::make_unique<MG::Blockchain>(settings.gameSettings.blockchainSettings);
         auto results = game.run(*minerGroup.get(), *blockchain.get());
 
         // something like :

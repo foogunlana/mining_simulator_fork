@@ -48,7 +48,8 @@ namespace mining_game {
         MinerCount totalMiners,
         MinerCount numDefault,
         std::vector<LM::Strategy *> learningStrategies,
-        LM::Strategy *defaultStrategy
+        LM::Strategy *defaultStrategy,
+        const Blockchain &chain
     ) {
         std::vector<std::unique_ptr<Miner>> miners;
         std::vector<Miner *> learningMiners;
@@ -59,7 +60,7 @@ namespace mining_game {
         for (MinerCount i = 0; i < totalMiners; i++) {
             auto minerName = std::to_string(rawCount(i));
             MinerParameters parameters {rawCount(i), minerName, hashRate};
-            miners.push_back(std::make_unique<Miner>(parameters, *defaultStrategy));
+            miners.push_back(std::make_unique<Miner>(parameters, *defaultStrategy, chain));
             if (i < numberRandomMiners) {
                 learningMiners.push_back(miners.back().get());
             }
@@ -78,12 +79,6 @@ namespace mining_game {
         }
     }
 
-    void MinerGroup::workOn(Blockchain &chain) {
-        for (auto &miner: miners) {
-            miner->start(chain);
-        }
-    }
-
     BlockTime MinerGroup::nextTimeBlockFound() const {
         return miningQueue.front()->nextMiningTime();
     }
@@ -93,7 +88,7 @@ namespace mining_game {
         while (miningQueue.front()->nextMiningTime() == now) {
             std::pop_heap(begin(miningQueue), end(miningQueue), miningSort);
             Miner *miner = miningQueue.back();
-            auto block = miner->mine(chain);
+            auto block = miner->mine(chain, now);
             blocksFound.push_back(std::move(block));
             std::push_heap(begin(miningQueue), end(miningQueue), miningSort);
         }
