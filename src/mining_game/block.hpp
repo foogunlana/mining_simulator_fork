@@ -34,6 +34,7 @@ namespace mining_game {
         Block(const BlockParameters params);
         Block(const Block * parent, const Miner * miner, const BlockParameters params);
         Profit realValue() const;
+        std::vector<const Block *> getChain() const;
     };
 }
 

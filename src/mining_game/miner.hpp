@@ -42,6 +42,7 @@ namespace mining_game {
 
         Value totalMiningCost;
         BlockTime _nextMiningTime;
+        BlockCount _blocksMinedTotal;
     public:
         const MinerParameters params;
         // Miner(MinerParameters parameters, const Strategy &strategy);
@@ -53,6 +54,13 @@ namespace mining_game {
         BlockTime nextMiningTime() const {
             return _nextMiningTime;
         }
+
+        BlockCount getBlocksMinedTotal() const {
+            return _blocksMinedTotal;
+        }
+
+        void print(std::ostream& where) const;
+        friend std::ostream& operator<<(std::ostream& os, const Miner& miner);
     };
 }
 

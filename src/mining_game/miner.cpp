@@ -26,6 +26,7 @@ namespace mining_game {
         strategy(strategy_), params(params_)
     {
         _nextMiningTime = utils::selectMiningOffset(chain.chanceToWin(params.hashRate));
+        _blocksMinedTotal = BlockCount(0);
         totalMiningCost = 0;
     }
 
@@ -35,10 +36,10 @@ namespace mining_game {
 
     std::unique_ptr<Block> Miner::mine(Blockchain &chain, BlockTime minedAt) {
         Block &parent = strategy.behaviour->chooseParent(chain, *this);
-
         // this should maybe be in the strategy
         // whenToMine and chooseParent
 
+        _blocksMinedTotal++;
         _nextMiningTime += utils::selectMiningOffset(chain.chanceToWin(params.hashRate));
 
         assert(minedAt > parent.params.minedAt);
@@ -61,4 +62,14 @@ namespace mining_game {
 
         return std::make_unique<Block>(&parent, this, params);
     }
+
+    std::ostream& operator<<(std::ostream& os, const Miner& miner) {
+        miner.print(os);
+        return os;
+    }
+
+    void Miner::print(std::ostream& os) const {
+        os << "[" << strategy.name  << "] miner " << params.name;
+    }
+
 }

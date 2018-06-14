@@ -10,6 +10,7 @@
 #include "blockchain_settings.hpp"
 #include "block.hpp"
 #include "miner_result.hpp"
+#include "miner.hpp"
 
 
 #include <iostream>
@@ -38,12 +39,53 @@ namespace mining_game {
             currentTime = minerGroup.nextTimeBlockFound();
             blockchain.advanceToTime(currentTime);
             minerGroup.mine(blockchain, currentTime);
-            std::cout << currentTime << '\n';
+
+            // std::cout << currentTime << '\n';
         } while (currentTime < endTime);
 
-        // Block &winningBlock = blockchain.winningHead();
+        std::vector<MinerResult> minerResults;
+        minerResults.resize(minerGroup.miners.size());
 
+        auto &winningBlock = blockchain.winningHead();
+        auto winningChain = winningBlock.getChain();
 
-        return GameResult();
+        int parentCount = 0;
+        Profit totalValue(0);
+
+        for (auto mined : winningChain) {
+            if (mined->height == BlockHeight(0)) {
+                break;
+            }
+            if (mined->parent->miner == mined->miner) {
+                parentCount++;
+            }
+            auto &miner = *(mined->miner);
+            minerResults[miner.params.number].addBlock(mined);
+            totalValue += mined->realValue();
+        }
+
+       std::cout << parentCount << " block mined over parent" << std::endl;
+        //calculate the score at the end
+        BlockCount totalBlocks(0);
+        BlockCount finalBlocks(0);
+
+        for (size_t i = 0; i < minerGroup.miners.size(); i++) {
+            const auto &miner = minerGroup.miners[i];
+            std::cout << *miner.get() << " earned:" << minerResults[i].totalProfit << " mined " << miner->getBlocksMinedTotal() <<" total, of which " << minerResults[i].blocksInWinningChain << " made it into the final chain" << std::endl;
+            totalBlocks += miner->getBlocksMinedTotal();
+            finalBlocks += minerResults[i].blocksInWinningChain;
+        }
+
+        Value moneyLeftAtEnd = winningBlock.params.rem + winningBlock.params.payForward;
+
+        GameResult result(minerResults, totalBlocks, finalBlocks, moneyLeftAtEnd, totalValue);
+
+        // assert(winningBlock.valueInChain == totalValue);
+        for (size_t i = 0; i < minerGroup.miners.size(); i++) {
+            assert(minerResults[i].totalProfit <= totalValue);
+        }
+
+        std::cout << "Total blocks mined:" << totalBlocks << " with " << finalBlocks << " making it into the final chain" << std::endl;
+        return result;
     }
 }

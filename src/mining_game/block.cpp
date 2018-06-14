@@ -23,4 +23,14 @@ namespace mining_game {
     Profit Block::realValue() const {
         return (Profit) gain - (Profit) loss;
     }
+
+    std::vector<const Block *> Block::getChain() const {
+        std::vector<const Block *> chain;
+        const Block *current = this;
+        while (current) {
+            chain.push_back(current);
+            current = current->parent;
+        }
+        return chain;
+    }
 }
