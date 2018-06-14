@@ -54,10 +54,6 @@ namespace mining_game {
         _blocksMinedTotal++;
         _nextMiningTime += utils::selectMiningOffset(chain.chanceToWin(params.hashRate));
 
-        if(minedAt <= parent.params.minedAt) {
-            std::cout << "minedAt=" << minedAt << " and parents minedAt=" << parent.params.minedAt << std::endl;
-            std::cout << "currentTime=" << chain.getTime() << " and height=" << parent.height << std::endl;
-        }
         assert(minedAt > parent.params.minedAt);
 
         BlockTime timeDiff = minedAt - parent.params.minedAt;
