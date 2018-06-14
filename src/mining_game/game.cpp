@@ -9,6 +9,7 @@
 #include "blockchain.hpp"
 #include "blockchain_settings.hpp"
 #include "block.hpp"
+#include "miner_result.hpp"
 
 
 #include <iostream>
@@ -22,20 +23,26 @@ namespace mining_game {
         BlockTime endTime = blockchainSettings.numberOfBlocks * blockchainSettings.secondsPerBlock;
         BlockTime currentTime;
 
-        auto genesis = std::make_unique<Block>();
+        auto params = BlockParameters{
+            BlockTime(0),
+            BlockTime(0),
+            Value(0),
+            Value(0),
+            Value(0),
+            Value(0),
+        };
+        auto genesis = std::make_unique<Block>(params);
         blockchain.addBlock(std::move(genesis));
-
-        int counter(0);
 
         do {
             currentTime = minerGroup.nextTimeBlockFound();
             blockchain.advanceToTime(currentTime);
             minerGroup.mine(blockchain, currentTime);
-            // std::cout << currentTime << '\n';
-            counter++;
+            std::cout << currentTime << '\n';
         } while (currentTime < endTime);
 
         // Block &winningBlock = blockchain.winningHead();
+
 
         return GameResult();
     }

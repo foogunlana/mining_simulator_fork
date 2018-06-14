@@ -41,15 +41,24 @@ namespace mining_game {
 
         _nextMiningTime += utils::selectMiningOffset(chain.chanceToWin(params.hashRate));
 
-        assert(minedAt > parent.minedAt);
+        assert(minedAt > parent.params.minedAt);
 
-        BlockTime timeDiff = minedAt - parent.minedAt;
-        Value txFeesAvailable = chain.txPooled(timeDiff) + parent.surplus;
+        BlockTime timeDiff = minedAt - parent.params.minedAt;
+        Value txFeesAvailable = chain.txPooled(timeDiff) + parent.params.rem + parent.params.payForward;
         Value txFees = txFeesAvailable;
-        Value surplus = txFeesAvailable - txFees;
+        Value rem = txFeesAvailable - txFees;
+        Value payForward = Value(0);
+        BlockTime publishedAt = minedAt;
 
-        // need to mock out reference to behaviour from strategy to test!!!
-        // else, can't make more complex blocks as the behaviour must do it too
-        return std::make_unique<Block>(&parent, this, minedAt, txFees, surplus);
+        auto params = BlockParameters{
+            minedAt,
+            publishedAt,
+            parent.params.fixedReward,
+            txFees,
+            rem,
+            payForward
+        };
+
+        return std::make_unique<Block>(&parent, this, params);
     }
 }

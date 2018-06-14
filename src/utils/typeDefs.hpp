@@ -9,6 +9,7 @@
 #ifndef typeDefs_hpp
 #define typeDefs_hpp
 
+typedef signed long long ProfitType;
 typedef unsigned long long ValueType;
 typedef unsigned long TimeType;
 typedef unsigned int HeightType;
@@ -34,6 +35,7 @@ struct Tag8 {};
 struct Tag9 {};
 struct Tag10 {};
 struct Tag11 {};
+struct Tag12 {};
 
 using HashRate = arithmetic::Arithmetic<RateType, Tag1>; // 1 / Block
 using TimeRate = arithmetic::Arithmetic<RateType, Tag2>; // 1 / second
@@ -41,6 +43,7 @@ using TimeRate = arithmetic::Arithmetic<RateType, Tag2>; // 1 / second
 using Value = arithmetic::Arithmetic<ValueType, Tag3>; // block
 using ValueRate = arithmetic::Arithmetic<ValueType, Tag4>; // money / second
 using BlockValue = arithmetic::Arithmetic<ValueType, Tag5>; // money / block
+using Profit = arithmetic::Arithmetic<ProfitType, Tag12> // money gained or lost
 
 using BlockHeight = arithmetic::Arithmetic<HeightType, Tag6>; // block
 using BlockTime = arithmetic::Arithmetic<TimeType, Tag7>; // seconds
@@ -81,6 +84,7 @@ using HashRate = RateType;
 using TimeRate = RateType;
 
 using Value = ValueType;
+using Profit = ProfitType;
 using ValueRate = ValueType;
 using BlockValue = ValueType;
 

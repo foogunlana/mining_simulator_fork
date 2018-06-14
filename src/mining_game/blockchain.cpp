@@ -47,7 +47,7 @@ namespace mining_game {
     }
 
     void Blockchain::addBlock(std::unique_ptr<Block> block) {
-        size_t height = block->getHeight();
+        size_t height = block->height;
         _maxHeightPub = height > _maxHeightPub ? height : _maxHeightPub;
         blocks[height].push_back(std::move(block));
     }

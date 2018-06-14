@@ -10,8 +10,15 @@
 
 
 namespace mining_game {
+
+    class Block;
+
     struct MinerResult {
+        BlockCount blocksInWinningChain;
+        Profit totalProfit;
+
         MinerResult();
+        void addBlock(const Block *block);
     };
 }
 

@@ -20,6 +20,10 @@ HeightType rawHeight(BlockHeight height) {
     return arithmetic::primitive_cast(height);
 }
 
+ProfitType rawValue(Profit profit) {
+    return arithmetic::primitive_cast(profit);
+}
+
 ValueType rawValue(Value value) {
     return arithmetic::primitive_cast(value);
 }
@@ -109,6 +113,10 @@ HeightType rawHeight(BlockHeight height) {
 
 ValueType rawValue(Value value) {
     return value;
+}
+
+ProfitType rawValue(Profit profit) {
+    return profit;
 }
 
 CountType rawCount(MinerCount count) {

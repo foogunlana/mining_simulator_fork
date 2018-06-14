@@ -10,22 +10,30 @@ namespace mining_game {
 
     class Miner;
 
+    struct BlockParameters {
+        BlockTime minedAt;
+        BlockTime publishedAt;
+        Value txFees;
+        Value fixedReward;
+        Value rem;
+        Value payForward;
+    };
+
     class Block {
     private:
-        size_t _height;
+        Value gain;
+        Value loss;
     public:
         const Miner * miner;
         const Block * parent;
-        const BlockTime minedAt;
-        const Value txFees;
-        const Value surplus;
+        const BlockParameters params;
+        const size_t height;
 
         Value valueInChain;
 
-        Block(const Block * parent, const Miner * miner, const BlockTime minedAt, const Value txFees, const Value surplus);
-        Block();
-
-        BlockHeight getHeight() { return _height; }
+        Block(const BlockParameters params);
+        Block(const Block * parent, const Miner * miner, const BlockParameters params);
+        Profit realValue() const;
     };
 }
 
