@@ -82,6 +82,7 @@ void run(RunSettings settings) {
     auto maxProfit = calculateMaxProfit(settings);
     MG::Game game(settings.gameSettings);
 
+    auto strategyWeights = model.getStrategyWeights();
 
     for (unsigned int gameNum = 0; gameNum < settings.numberOfGames; gameNum++) {
 
@@ -101,32 +102,13 @@ void run(RunSettings settings) {
             minerProfiles[i].currentReward = results.minerResults[i].totalProfit;
         }
         minerProfiles = model.updateStrategyProfiles(minerProfiles, maxProfit);
+        strategyWeights = model.getStrategyWeights();
 
-        // something like :
+        for (size_t strategy = 0; strategy < strategyWeights.size(); strategy++) {
+            std::cout << strategyNames[strategy] << "->" << strategyWeights[strategy] << "  ||  ";
+        }
+        std::cout << std::endl;
 
-        // blockchain->reset(settings.gameSettings.blockchainSettings);
-        // for (size_t strategy = 0; strategy < strategyWeights.size(); strategy++) {
-        //     std::cout << strategyNames[strategy] << "->" << strategyWeights[strategy] << "  ||  ";
-        // }
-        // std::cout << std::endl;
-
-        // model->writeWeights(gameNum);
-        // minerGroup.reset(*blockchain);
-        // for (size_t i = 0; i < learningMiners.size(); i++) {
-            // something like miners[i]->changeStrategy(minerProfiles[i].currentStrategy)
-        // }
-        // minerGroup.resetOrder();
-
-        // auto result = runGame(minerGroup, *blockchain, settings.gameSettings);
-        // something like the below!
-        // for (size_t miner = 0; miner < result.size(); miner++) {
-        //     minerProfiles[miner].currentReward = result[miner].reward;
-        // }
-
-        // Value maxProfit = calculateMaxProfit(settings);
-
-        // Steps 3, 4, 5
-        // minerProfiles = model.updateStrategyProfiles(minerProfiles, maxProfit);
     }
     // model->writeWeights(settings.numberOfGames);
 }
@@ -147,7 +129,7 @@ int main(int, const char * []) {
     MG::GameSettings gameSettings = {blockchainSettings};
 
     // RunSettings runSettings = {1000, MinerCount(200), MinerCount(0), gameSettings, "test"};
-    RunSettings runSettings = {1000, MinerCount(200), MinerCount(0), gameSettings, "test"};
+    RunSettings runSettings = {100, MinerCount(200), MinerCount(0), gameSettings, "test"};
     run(runSettings);
 
 }
