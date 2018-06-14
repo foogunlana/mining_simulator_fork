@@ -6,6 +6,7 @@
 #include "blockchain.hpp"
 #include "blockchain_settings.hpp"
 #include "block.hpp"
+#include "miner.hpp"
 #include "src/utils/utils.hpp"
 
 #include <iostream>
@@ -23,6 +24,29 @@ namespace mining_game {
         blocks.resize(rawCount(blockchainSettings.numberOfBlocks) * 2);
         // _smallestBlocks.resize(rawCount(blockchainSettings.numberOfBlocks) * 2);
         // reset(blockchainSettings);
+    }
+
+    std::unique_ptr<Block> Blockchain::createBlock(Block *parent, Miner *miner, BlockParameters params) {
+        if (oldBlocks.size() == 0) {
+            return std::make_unique<Block>(parent, miner, params);
+        }
+        auto block = std::move(oldBlocks.back());
+        oldBlocks.pop_back();
+        block->reset(parent, miner, params);
+        return block;
+    }
+
+    void Blockchain::reset() {
+        valueNetworkTotal = Value(0);
+        timeInSecs = BlockTime(0);
+        _maxHeightPub = BlockHeight(0);
+        oldBlocks.reserve(oldBlocks.size() + blocks.size());
+        for (auto &siblings : blocks) {
+            for (auto &block : siblings) {
+                oldBlocks.push_back(std::move(block));
+            }
+            siblings.clear();
+        }
     }
 
     Block &Blockchain::winningHead() const {

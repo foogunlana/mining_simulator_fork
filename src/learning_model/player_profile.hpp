@@ -12,7 +12,7 @@ namespace learning_model {
         std::vector<StratWeight> weights;
         std::vector<double> probabilities;
         size_t currentStrategy;
-        Value currentReward;
+        Profit currentReward;
     };
 }
 

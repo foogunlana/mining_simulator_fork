@@ -64,14 +64,14 @@ namespace mining_game {
             totalValue += mined->realValue();
         }
 
-       std::cout << parentCount << " block mined over parent" << std::endl;
+       // std::cout << parentCount << " block mined over parent" << std::endl;
         //calculate the score at the end
         BlockCount totalBlocks(0);
         BlockCount finalBlocks(0);
 
         for (size_t i = 0; i < minerGroup.miners.size(); i++) {
             const auto &miner = minerGroup.miners[i];
-            std::cout << *miner.get() << " earned:" << minerResults[i].totalProfit << " mined " << miner->getBlocksMinedTotal() <<" total, of which " << minerResults[i].blocksInWinningChain << " made it into the final chain" << std::endl;
+            // std::cout << *miner.get() << " earned:" << minerResults[i].totalProfit << " mined " << miner->getBlocksMinedTotal() <<" total, of which " << minerResults[i].blocksInWinningChain << " made it into the final chain" << std::endl;
             totalBlocks += miner->getBlocksMinedTotal();
             finalBlocks += minerResults[i].blocksInWinningChain;
         }
@@ -85,7 +85,7 @@ namespace mining_game {
             assert(minerResults[i].totalProfit <= totalValue);
         }
 
-        std::cout << "Total blocks mined:" << totalBlocks << " with " << finalBlocks << " making it into the final chain" << std::endl;
+        // std::cout << "Total blocks mined:" << totalBlocks << " with " << finalBlocks << " making it into the final chain" << std::endl;
         return result;
     }
 }

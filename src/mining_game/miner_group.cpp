@@ -16,7 +16,7 @@
 
 #include <limits>
 #include <cassert>
-
+#include <iostream>
 
 // constexpr auto maxTime = BlockTime(std::numeric_limits<BlockTime>::max());
 
@@ -40,6 +40,13 @@ namespace mining_game {
 
         for (auto &miner : miners) {
             miningQueue.push_back(miner.get());
+        }
+        std::make_heap(begin(miningQueue), end(miningQueue), miningSort);
+    }
+
+    void MinerGroup::reset(Blockchain &chain) {
+        for (auto &miner : miners) {
+            miner->reset(chain);
         }
         std::make_heap(begin(miningQueue), end(miningQueue), miningSort);
     }

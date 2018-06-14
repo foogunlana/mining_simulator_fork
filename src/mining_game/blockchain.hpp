@@ -14,7 +14,9 @@
 namespace mining_game {
 
     class Block;
+    class Miner;
     struct BlockchainSettings;
+    struct BlockParameters;
 
     class Blockchain {
     private:
@@ -25,11 +27,14 @@ namespace mining_game {
 
         size_t _maxHeightPub;
         std::vector<std::vector<std::unique_ptr<Block>>> blocks;
+        std::vector<std::unique_ptr<Block>> oldBlocks;
     public:
         Blockchain(BlockchainSettings blockchainSettings);
 
+        void reset();
         void advanceToTime(BlockTime time);
         void addBlock(std::unique_ptr<Block> block);
+        std::unique_ptr<Block> createBlock(Block *parent, Miner *miner, BlockParameters params);
 
         Block &winningHead() const;
         Value txPooled(BlockTime period) const;

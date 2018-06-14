@@ -12,9 +12,18 @@ namespace mining_game {
         loss = Value(0);
     }
 
-    Block::Block(const Block *parent_, const Miner * miner_, const BlockParameters params_) :
+    Block::Block(Block *parent_, Miner * miner_, BlockParameters params_) :
         miner(miner_), parent(parent_), params(params_), height(parent_->height + size_t(1))
     {
+        valueInChain = parent->valueInChain + params.txFees + params.fixedReward;
+        gain = params.txFees + params.fixedReward;
+        loss = params.payForward;
+    }
+
+    void Block::reset(Block *parent_, Miner * miner_, BlockParameters params_) {
+        parent = parent_;
+        miner = miner_;
+        params = params_;
         valueInChain = parent->valueInChain + params.txFees + params.fixedReward;
         gain = params.txFees + params.fixedReward;
         loss = params.payForward;

@@ -62,7 +62,7 @@ namespace learning_model {
             }
             p.probabilities = probabilitiesFromWeights(p.weights);
             p.currentStrategy = strategyFromProbabilities(gen, p.probabilities);
-            p.currentReward = 0;
+            p.currentReward = Profit(0);
             profiles.push_back(p);
         }
         return profiles;

@@ -30,6 +30,18 @@ namespace mining_game {
         totalMiningCost = 0;
     }
 
+    void Miner::reset(Blockchain &chain) {
+        _blocksMinedTotal = BlockCount(0);
+        unbroadcastBlocks.clear();
+        // _nextPublishTime = BlockTime(std::numeric_limits<TimeType>::max());
+        // _lastCostUpdate = BlockTime(0);
+
+        // no-one should mistakenly mine immediately the chain starts!
+        _nextMiningTime = BlockTime(1) + utils::selectMiningOffset(chain.chanceToWin(params.hashRate));
+        totalMiningCost = 0;
+        // waitingForBroadcast = false;
+    }
+
     void Miner::changeStrategy(LM::Strategy &strategy) {
 
     }
@@ -42,6 +54,10 @@ namespace mining_game {
         _blocksMinedTotal++;
         _nextMiningTime += utils::selectMiningOffset(chain.chanceToWin(params.hashRate));
 
+        if(minedAt <= parent.params.minedAt) {
+            std::cout << "minedAt=" << minedAt << " and parents minedAt=" << parent.params.minedAt << std::endl;
+            std::cout << "currentTime=" << chain.getTime() << " and height=" << parent.height << std::endl;
+        }
         assert(minedAt > parent.params.minedAt);
 
         BlockTime timeDiff = minedAt - parent.params.minedAt;
@@ -60,7 +76,7 @@ namespace mining_game {
             payForward
         };
 
-        return std::make_unique<Block>(&parent, this, params);
+        return chain.createBlock(&parent, this, params);
     }
 
     std::ostream& operator<<(std::ostream& os, const Miner& miner) {

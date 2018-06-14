@@ -24,15 +24,17 @@ namespace mining_game {
         Value gain;
         Value loss;
     public:
-        const Miner * miner;
-        const Block * parent;
-        const BlockParameters params;
+        Miner * miner;
+        Block * parent;
+        BlockParameters params;
         const size_t height;
 
         Value valueInChain;
 
-        Block(const BlockParameters params);
-        Block(const Block * parent, const Miner * miner, const BlockParameters params);
+        Block(BlockParameters params);
+        Block(Block * parent, Miner * miner, BlockParameters params);
+
+        void reset(Block *parent_, Miner * miner_, BlockParameters params_);
         Profit realValue() const;
         std::vector<const Block *> getChain() const;
     };

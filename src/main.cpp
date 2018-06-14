@@ -77,7 +77,11 @@ void run(RunSettings settings) {
         defaultStrategy.get(),
         *blockchain.get());
 
+    // NOTE: max profit is unpredictable in pay forward game since miners subsidise with external funds
+    // NOTE: max profit calculated is in case of no pay forward
+    auto maxProfit = calculateMaxProfit(settings);
     MG::Game game(settings.gameSettings);
+
 
     for (unsigned int gameNum = 0; gameNum < settings.numberOfGames; gameNum++) {
 
@@ -85,18 +89,20 @@ void run(RunSettings settings) {
         // std::vector<StratWeight> strategyWeights = model.getStrategyWeights();
 
         // NOTE: for multiple games, take minerGroup and blockchain out of loop and reset them
-        // minerGroup.reset();
-        // blockchain.reset();
+
+        blockchain->reset();
+        minerGroup->reset(*blockchain.get());
 
         minerGroup->updateLearningMinerStrategies(minerProfiles);
         auto results = game.run(*minerGroup.get(), *blockchain.get());
 
+        assert(results.minerResults.size() == minerProfiles.size());
+        for (size_t i = 0; i < results.minerResults.size(); i++) {
+            minerProfiles[i].currentReward = results.minerResults[i].totalProfit;
+        }
+        minerProfiles = model.updateStrategyProfiles(minerProfiles, maxProfit);
+
         // something like :
-        // assert(results.minerResults.size() == minerProfiles.size());
-        // for (size_t i = 0; i < results.size(); i++) {
-        //     minerProfiles.currentReward = results.minerResults[i].profit;
-        // }
-        // minerProfiles = model.updateStrategyProfiles(minerProfiles, maxProfit);
 
         // blockchain->reset(settings.gameSettings.blockchainSettings);
         // for (size_t strategy = 0; strategy < strategyWeights.size(); strategy++) {
@@ -141,7 +147,7 @@ int main(int, const char * []) {
     MG::GameSettings gameSettings = {blockchainSettings};
 
     // RunSettings runSettings = {1000, MinerCount(200), MinerCount(0), gameSettings, "test"};
-    RunSettings runSettings = {1, MinerCount(5), MinerCount(0), gameSettings, "test"};
+    RunSettings runSettings = {1000, MinerCount(200), MinerCount(0), gameSettings, "test"};
     run(runSettings);
 
 }
