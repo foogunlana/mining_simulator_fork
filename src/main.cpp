@@ -89,8 +89,6 @@ void run(RunSettings settings) {
         // NOTE: for printing
         // std::vector<StratWeight> strategyWeights = model.getStrategyWeights();
 
-        // NOTE: for multiple games, take minerGroup and blockchain out of loop and reset them
-
         blockchain->reset();
         minerGroup->reset(*blockchain.get());
 
@@ -129,7 +127,7 @@ int main(int, const char * []) {
     MG::GameSettings gameSettings = {blockchainSettings};
 
     // RunSettings runSettings = {1000, MinerCount(200), MinerCount(0), gameSettings, "test"};
-    RunSettings runSettings = {100, MinerCount(200), MinerCount(0), gameSettings, "test"};
+    RunSettings runSettings = {100, MinerCount(5), MinerCount(0), gameSettings, "test"};
     run(runSettings);
 
 }
