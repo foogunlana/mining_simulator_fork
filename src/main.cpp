@@ -33,6 +33,11 @@ struct RunSettings {
 
 Value calculateMaxProfit(RunSettings settings);
 void run(RunSettings settings);
+void analyse(
+    const std::vector<LM::PlayerProfile> profiles,
+    const std::vector<StratWeight> weights,
+    const std::vector<std::string> names
+);
 
 Value calculateMaxProfit(RunSettings settings) {
     auto secsPerBlock(settings.gameSettings.blockchainSettings.secondsPerBlock);
@@ -103,14 +108,20 @@ void run(RunSettings settings) {
         }
         minerProfiles = model.updateStrategyProfiles(minerProfiles, maxProfit);
         strategyWeights = model.getStrategyWeights();
-
-        for (size_t strategy = 0; strategy < strategyWeights.size(); strategy++) {
-            std::cout << strategyNames[strategy] << "->" << strategyWeights[strategy] << "  ||  ";
-        }
-        std::cout << std::endl;
-
+        analyse(minerProfiles, strategyWeights, strategyNames);
     }
     // model->writeWeights(settings.numberOfGames);
+}
+
+void analyse(
+    const std::vector<LM::PlayerProfile> profiles,
+    const std::vector<StratWeight> weights,
+    const std::vector<std::string> names
+) {
+    for (size_t strategy = 0; strategy < weights.size(); strategy++) {
+        std::cout << names[strategy] << "->" << weights[strategy] << "  ||  ";
+    }
+    std::cout << std::endl;
 }
 
 int main(int, const char * []) {
@@ -129,7 +140,7 @@ int main(int, const char * []) {
     MG::GameSettings gameSettings = {blockchainSettings};
 
     // RunSettings runSettings = {1000, MinerCount(200), MinerCount(0), gameSettings, "test"};
-    RunSettings runSettings = {100, MinerCount(5), MinerCount(0), gameSettings, "test"};
+    RunSettings runSettings = {1, MinerCount(200), MinerCount(0), gameSettings, "test"};
     run(runSettings);
 
 }
