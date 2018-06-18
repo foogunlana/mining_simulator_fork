@@ -68,12 +68,11 @@ namespace mining_game {
         auto blockParams = BlockParameters{
             minedAt,
             publishedAt,
-            parent.params.fixedReward,
             txFees,
+            parent.params.fixedReward,
             rem,
             payForward
         };
-
         return chain.createBlock(&parent, this, blockParams);
     }
 
