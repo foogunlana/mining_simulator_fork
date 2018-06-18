@@ -54,9 +54,8 @@ void run(RunSettings settings) {
     auto petty = std::make_unique<MG::PettyBehaviour>();
     auto defaultStrategy(std::make_unique<LM::Strategy>("default", defaultWeight, honest.get()));
 
-    std::vector<std::string> strategyNames{"petty", "honest"};
-    learningStrategies.push_back(std::make_unique<LM::Strategy>(strategyNames[0], defaultWeight, petty.get()));
-    learningStrategies.push_back(std::make_unique<LM::Strategy>(strategyNames[1], defaultWeight, honest.get()));
+    learningStrategies.push_back(std::make_unique<LM::Strategy>("petty", defaultWeight, petty.get()));
+    learningStrategies.push_back(std::make_unique<LM::Strategy>("honest", defaultWeight, honest.get()));
 
     //start running games
     // BlockCount totalBlocksMined(0);
@@ -100,7 +99,6 @@ void run(RunSettings settings) {
         minerGroup->reset(*blockchain.get());
 
         minerGroup->updateLearningMinerStrategies(minerProfiles);
-
         auto results = game.run(*minerGroup.get(), *blockchain.get());
 
         assert(results.minerResults.size() == minerProfiles.size());
@@ -108,9 +106,9 @@ void run(RunSettings settings) {
             minerProfiles[i].currentReward = results.minerResults[i].totalProfit;
         }
 
+        analyse(minerGroup->getLearningMiners(), minerProfiles);
         strategyWeights = model.getStrategyWeights();
         minerProfiles = model.updateStrategyProfiles(minerProfiles, maxProfit);
-        analyse(minerGroup->getLearningMiners(), minerProfiles);
 
     }
     // model->writeWeights(settings.numberOfGames);
