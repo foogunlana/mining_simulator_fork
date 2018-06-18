@@ -28,7 +28,7 @@ namespace mining_game {
     // }
 
     Value PettyBehaviour::collectFees(const Blockchain & chain, const Miner & miner, const Block & block, Value txFeesAvailable) const {
-        return Value(0);
+        return txFeesAvailable;
     }
 
     Value PettyBehaviour::payForward(const Blockchain & chain, const Miner & miner, const Block & block, Value fees) const {
