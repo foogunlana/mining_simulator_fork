@@ -11,6 +11,7 @@
 #include "src/mining_game/game.hpp"
 #include "src/mining_game/blockchain.hpp"
 #include "src/mining_game/default_behaviour.hpp"
+#include "src/mining_game/petty_behaviour.hpp"
 
 #include <vector>
 #include <iostream>
@@ -49,10 +50,11 @@ void run(RunSettings settings) {
     StratWeight defaultWeight(1);
 
     auto honest = std::make_unique<MG::DefaultBehaviour>();
+    auto petty = std::make_unique<MG::PettyBehaviour>();
     auto defaultStrategy(std::make_unique<LM::Strategy>("default", defaultWeight, honest.get()));
 
-    std::vector<std::string> strategyNames{"petty", "lazy-fork"};
-    learningStrategies.push_back(std::make_unique<LM::Strategy>(strategyNames[0], defaultWeight, honest.get()));
+    std::vector<std::string> strategyNames{"petty", "honest"};
+    learningStrategies.push_back(std::make_unique<LM::Strategy>(strategyNames[0], defaultWeight, petty.get()));
     learningStrategies.push_back(std::make_unique<LM::Strategy>(strategyNames[1], defaultWeight, honest.get()));
 
     //start running games
