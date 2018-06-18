@@ -21,6 +21,7 @@ namespace mining_game {
     }
 
     void Block::reset(Block *parent_, Miner * miner_, BlockParameters params_) {
+        height = parent_->height + size_t(1);
         parent = parent_;
         miner = miner_;
         params = params_;

@@ -27,7 +27,7 @@ namespace mining_game {
         Miner * miner;
         Block * parent;
         BlockParameters params;
-        const size_t height;
+        size_t height;
 
         Value valueInChain;
 
