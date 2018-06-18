@@ -42,7 +42,7 @@ Value calculateMaxProfit(RunSettings settings) {
     BlockValue transactionFeeRate(settings.gameSettings.blockchainSettings.transactionFeeRate);
     Value transactionFeesTaken(transactionFeeRate * (expNumBlocks * secsPerBlock) - moneyLeftAtEnd);
 
-    return transactionFeesTaken / Value(rawCount(settings.totalMiners) / 4);
+    return (double) transactionFeesTaken / Value(rawCount(settings.totalMiners) / 4);
 }
 
 void run(RunSettings settings) {
