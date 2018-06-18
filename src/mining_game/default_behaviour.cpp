@@ -26,11 +26,11 @@ namespace mining_game {
     //
     // }
 
-    Value DefaultBehaviour::collectFees(const Blockchain & chain, const Block & block, const Miner & miner) const {
+    Value DefaultBehaviour::collectFees(const Blockchain & chain, const Miner & miner, const Block & block) const {
         return Value(0);
     }
 
-    Value DefaultBehaviour::payForward(const Blockchain & chain, const Block & block, Value fees, const Miner & miner) const {
+    Value DefaultBehaviour::payForward(const Blockchain & chain, const Miner & miner, const Block & block, Value fees) const {
         return Value(0);
     }
 }

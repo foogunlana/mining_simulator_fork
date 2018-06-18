@@ -26,14 +26,15 @@ namespace learning_model {
 
         virtual Value collectFees(
             const MG::Blockchain & chain,
-            const MG::Block & block,
-            const MG::Miner & miner
+            const MG::Miner & miner,
+            const MG::Block & block
         ) const = 0;
 
         virtual Value payForward(
             const MG::Blockchain & chain,
+            const MG::Miner & miner,
             const MG::Block & block,
-            Value fees, const MG::Miner & miner
+            Value fees
         ) const = 0;
     };
 }
