@@ -27,7 +27,8 @@ namespace learning_model {
         virtual Value collectFees(
             const MG::Blockchain & chain,
             const MG::Miner & miner,
-            const MG::Block & block
+            const MG::Block & block,
+            Value txFeesAvailable
         ) const = 0;
 
         virtual Value payForward(

@@ -48,6 +48,11 @@ namespace mining_game {
 
     std::unique_ptr<Block> Miner::mine(Blockchain &chain, BlockTime minedAt) {
         Block &parent = strategy.behaviour->chooseParent(chain, *this);
+
+        BlockTime timeDiff = minedAt - parent.params.minedAt;
+        Value txFeesAvailable = chain.txPooled(timeDiff) + parent.params.rem + parent.params.payForward;
+        Value txFees = strategy.behaviour->collectFees(chain, *this, parent, txFeesAvailable);
+
         // this should maybe be in the strategy
         // whenToMine and chooseParent
 
@@ -56,9 +61,6 @@ namespace mining_game {
 
         assert(minedAt > parent.params.minedAt);
 
-        BlockTime timeDiff = minedAt - parent.params.minedAt;
-        Value txFeesAvailable = chain.txPooled(timeDiff) + parent.params.rem + parent.params.payForward;
-        Value txFees = txFeesAvailable;
         Value rem = txFeesAvailable - txFees;
         Value payForward = Value(0);
         BlockTime publishedAt = minedAt;

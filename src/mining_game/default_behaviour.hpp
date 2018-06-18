@@ -20,7 +20,7 @@ namespace mining_game {
 
         Block & chooseParent(const Blockchain & chain, const Miner & miner) const override;
         // Block & publish(const Blockchain & chain, const & miner) const;
-        Value collectFees(const Blockchain & chain, const Miner & miner, const Block & block) const override;
+        Value collectFees(const Blockchain & chain, const Miner & miner, const Block & block, Value txFeesAvailable) const override;
         Value payForward(const Blockchain & chain, const Miner & miner, const Block & block, Value fees) const override;
     };
 }
