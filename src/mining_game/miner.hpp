@@ -11,14 +11,15 @@
 
 #include "src/utils/typeDefs.hpp"
 #include "block.hpp"
+#include "src/learning_model/strategy.hpp"
 
 #include <string>
 #include <queue>
 // #include <memory>
 
-namespace learning_model {
-    class Strategy;
-}
+// namespace learning_model {
+//     class Strategy;
+// }
 
 namespace LM = learning_model;
 
@@ -36,9 +37,9 @@ namespace mining_game {
 
     class Miner {
     private:
-        // std::reference_wrapper<const Strategy> strategy;
+        std::reference_wrapper<const LM::Strategy> strategy;
         std::vector<std::unique_ptr<Block>> unbroadcastBlocks;
-        LM::Strategy &strategy;
+        // LM::Strategy &strategy;
 
         Value totalMiningCost;
         BlockTime _nextMiningTime;
@@ -58,6 +59,10 @@ namespace mining_game {
 
         BlockCount getBlocksMinedTotal() const {
             return _blocksMinedTotal;
+        }
+
+        std::string getStrategyName() const {
+            return strategy.get().name;
         }
 
         void print(std::ostream& where) const;

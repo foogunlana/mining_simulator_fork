@@ -33,11 +33,7 @@ struct RunSettings {
 
 Value calculateMaxProfit(RunSettings settings);
 void run(RunSettings settings);
-void analyse(
-    const std::vector<LM::PlayerProfile> profiles,
-    const std::vector<StratWeight> weights,
-    const std::vector<std::string> names
-);
+void analyse(const std::vector<MG::Miner *> & miners, std::vector<LM::PlayerProfile> profiles);
 
 Value calculateMaxProfit(RunSettings settings) {
     auto secsPerBlock(settings.gameSettings.blockchainSettings.secondsPerBlock);
@@ -76,6 +72,10 @@ void run(RunSettings settings) {
     MinerCount numberRandomMiners(settings.totalMiners - settings.fixedDefault);
     std::vector<LM::PlayerProfile> minerProfiles = model.pickStrategiesEvenly(numberRandomMiners);
 
+    // for (auto profile : minerProfiles) {
+    //     std::cout << expLearningStrategies[profile.currentStrategy]->name << std::endl;
+    // }
+
     auto blockchain = std::make_unique<MG::Blockchain>(settings.gameSettings.blockchainSettings);
     auto minerGroup = MG::MinerGroup::build(
         settings.totalMiners,
@@ -100,28 +100,32 @@ void run(RunSettings settings) {
         minerGroup->reset(*blockchain.get());
 
         minerGroup->updateLearningMinerStrategies(minerProfiles);
+
         auto results = game.run(*minerGroup.get(), *blockchain.get());
 
         assert(results.minerResults.size() == minerProfiles.size());
         for (size_t i = 0; i < results.minerResults.size(); i++) {
             minerProfiles[i].currentReward = results.minerResults[i].totalProfit;
         }
-        minerProfiles = model.updateStrategyProfiles(minerProfiles, maxProfit);
+
         strategyWeights = model.getStrategyWeights();
-        analyse(minerProfiles, strategyWeights, strategyNames);
+        minerProfiles = model.updateStrategyProfiles(minerProfiles, maxProfit);
+        analyse(minerGroup->getLearningMiners(), minerProfiles);
+
     }
     // model->writeWeights(settings.numberOfGames);
 }
 
-void analyse(
-    const std::vector<LM::PlayerProfile> profiles,
-    const std::vector<StratWeight> weights,
-    const std::vector<std::string> names
-) {
-    for (size_t strategy = 0; strategy < weights.size(); strategy++) {
-        std::cout << names[strategy] << "->" << weights[strategy] << "  ||  ";
+void analyse(const std::vector<MG::Miner *> & miners, std::vector<LM::PlayerProfile> profiles) {
+    for (size_t miner = 0; miner < miners.size(); miner++) {
+        std::cout <<
+        "strategy = " << miners[miner]->getStrategyName() << " || " <<
+        "reward = " << profiles[miner].currentReward << std::endl;
     }
-    std::cout << std::endl;
+    // for (size_t strategy = 0; strategy < weights.size(); strategy++) {
+    //     std::cout << names[strategy] << "->" << weights[strategy] << "  ||  ";
+    // }
+    // std::cout << std::endl;
 }
 
 int main(int, const char * []) {

@@ -44,8 +44,9 @@ namespace mining_game {
         const std::vector<Miner *> learningMiners;
         std::vector<Miner *> miningQueue;
 
-        void reset(Blockchain &chain);
         BlockTime nextTimeBlockFound() const;
+        const std::vector<Miner *> & getLearningMiners() const;
+        void reset(Blockchain &chain);
         void mine(Blockchain & blockchain, BlockTime untilTime);
         void updateLearningMinerStrategies(const std::vector<LM::PlayerProfile> & strategyProfiles);
     };

@@ -77,12 +77,16 @@ namespace mining_game {
             std::move(miners), learningMiners, learningStrategies);
     }
 
+    const std::vector<Miner *> & MinerGroup::getLearningMiners() const {
+        return learningMiners;
+    }
+
     void MinerGroup::updateLearningMinerStrategies(const std::vector<LM::PlayerProfile> & profiles) {
         assert(learningMiners.size() == profiles.size());
 
         for (size_t miner = 0; miner < learningMiners.size(); miner++) {
-            LM::Strategy *strategy = learningStrategies[profiles[miner].currentStrategy];
-            learningMiners[miner]->changeStrategy(*strategy);
+            learningMiners[miner]->changeStrategy(
+                *learningStrategies[profiles[miner].currentStrategy]);
         }
     }
 
