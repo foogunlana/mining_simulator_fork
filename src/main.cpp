@@ -154,7 +154,7 @@ int main(int, const char * []) {
     MG::GameSettings gameSettings = {blockchainSettings};
 
     // RunSettings runSettings = {1000, MinerCount(200), MinerCount(0), gameSettings, "test"};
-    RunSettings runSettings = {10, MinerCount(200), MinerCount(0), gameSettings, "test"};
+    RunSettings runSettings = {1000, MinerCount(200), MinerCount(0), gameSettings, "test"};
     run(runSettings);
 
 }

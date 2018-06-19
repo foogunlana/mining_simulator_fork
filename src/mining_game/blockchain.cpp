@@ -88,12 +88,17 @@ namespace mining_game {
         if (_maxHeightPub == 0) {
             return blocks[0];
         }
+        assert((_maxHeightPub - offset) <= (2 * _maxHeightPub)); //acceptable range
         auto height = offset < 0 ? _maxHeightPub + offset : offset;
         return blocks[height];
     }
 
     TimeRate Blockchain::chanceToWin(HashRate hashRate) const {
         return hashRate / secondsPerBlock;
+    }
+
+    Value Blockchain::gap() const {
+        return most(frontier()).params.rem - most(frontier(-1)).params.rem;
     }
 
     Block & Blockchain::most(const std::vector<std::unique_ptr<Block>> & blocks) {

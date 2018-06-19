@@ -15,10 +15,16 @@
 
 namespace mining_game {
 
+    bool lazyUndercutIsProfitable(const Blockchain & chain);
+
     LazyForkBehaviour::LazyForkBehaviour() : learning_model::Behaviour() {}
 
     Block & LazyForkBehaviour::chooseParent(const Blockchain & chain, const Miner & miner) const {
-        return chain.most(chain.frontier(-1));
+        if (lazyUndercutIsProfitable(chain) && (chain.getMaxHeightPub() != 0)) {
+            return chain.most(chain.frontier(-1));
+        } else {
+            return chain.most(chain.frontier());
+        }
     }
 
     // Block & publish(const Blockchain & chain, const & miner) const {
@@ -31,6 +37,10 @@ namespace mining_game {
 
     Value LazyForkBehaviour::payForward(const Blockchain & chain, const Miner & miner, const Block & block, Value fees) const {
         return Value(0);
+    }
+
+    bool lazyUndercutIsProfitable(const Blockchain & chain) {
+        return chain.gap() >= chain.most(chain.frontier()).params.rem;
     }
 
 }
