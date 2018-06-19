@@ -40,9 +40,12 @@ namespace mining_game {
         Value txPooled(BlockTime period) const;
         TimeRate chanceToWin(HashRate hashRate) const;
         const std::vector<std::unique_ptr<Block>> & frontier() const;
+        const std::vector<std::unique_ptr<Block>> & frontier(signed int offset) const;
 
         BlockTime getTime() const { return timeInSecs; };
         BlockTime getMaxHeightPub() const { return _maxHeightPub; };
+
+        static Block & most(const std::vector<std::unique_ptr<Block>> & blocks);
     };
 }
 

@@ -15,12 +15,10 @@
 
 namespace mining_game {
 
-    Block & mostRem(const std::vector<std::unique_ptr<Block>> & blocks);
-
     LazyForkBehaviour::LazyForkBehaviour() : learning_model::Behaviour() {}
 
     Block & LazyForkBehaviour::chooseParent(const Blockchain & chain, const Miner & miner) const {
-        return mostRem(chain.frontier());
+        return chain.most(chain.frontier(-1));
     }
 
     // Block & publish(const Blockchain & chain, const & miner) const {

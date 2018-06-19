@@ -84,7 +84,31 @@ namespace mining_game {
         return blocks[_maxHeightPub];
     }
 
+    const std::vector<std::unique_ptr<Block>> & Blockchain::frontier(signed int offset) const {
+        if (_maxHeightPub == 0) {
+            return blocks[0];
+        }
+        auto height = offset < 0 ? _maxHeightPub + offset : offset;
+        return blocks[height];
+    }
+
     TimeRate Blockchain::chanceToWin(HashRate hashRate) const {
         return hashRate / secondsPerBlock;
+    }
+
+    Block & Blockchain::most(const std::vector<std::unique_ptr<Block>> & blocks) {
+        Value maxRem(0);
+        for (const auto &block : blocks) {
+            maxRem = block->params.rem > maxRem ? block->params.rem : maxRem;
+        }
+        std::vector<Block *> possiblities;
+        for (const auto &block : blocks) {
+            if (block->params.rem == maxRem) {
+                possiblities.push_back(block.get());
+            }
+        }
+        size_t index = utils::selectRandomIndex(possiblities.size());
+        Block *block = possiblities[index];
+        return *block;
     }
 }
