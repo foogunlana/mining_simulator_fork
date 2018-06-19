@@ -16,6 +16,8 @@
 
 #include <vector>
 #include <iostream>
+#include <fstream>
+#include <sys/stat.h>
 
 #define LAMBERT_COEFF 0.13533528323661
 //coeff for lambert func equil  must be in [0,.2]
@@ -32,13 +34,30 @@ struct RunSettings {
     std::string folderPrefix;
 };
 
+std::string makeResultsFolder(RunSettings settings);
 Value calculateMaxProfit(RunSettings settings);
 void run(RunSettings settings);
-void analyse(
-    const std::vector<MG::Miner *> & miners,
-    const std::vector<LM::PlayerProfile> profiles,
-    const std::vector<StratWeight> weights
-);
+void writeWeights(unsigned int gameNum, LM::Exp3 model, std::vector<std::ofstream> & outputStreams);
+
+
+void writeWeights(unsigned int gameNum, LM::Exp3 model, std::vector<std::ofstream> & outputStreams) {
+    auto strategyWeights = model.getStrategyWeights();
+    for (size_t i = 0; i < strategyWeights.size(); i++) {
+        outputStreams[i] << gameNum << " " << strategyWeights[i] << '\n';
+    }
+}
+
+std::string makeResultsFolder(RunSettings settings) {
+    std::string resultFolder = "";
+    if (settings.folderPrefix.length() > 0) {
+        resultFolder += settings.folderPrefix + "-";
+    }
+    resultFolder += std::to_string(rawCount(settings.fixedDefault));
+    char final [256];
+    sprintf (final, "./%s", resultFolder.c_str());
+    mkdir(final,0775);
+    return resultFolder;
+}
 
 Value calculateMaxProfit(RunSettings settings) {
     auto secsPerBlock(settings.gameSettings.blockchainSettings.secondsPerBlock);
@@ -58,14 +77,17 @@ void run(RunSettings settings) {
     auto honest = std::make_unique<MG::DefaultBehaviour>();
     auto petty = std::make_unique<MG::PettyBehaviour>();
     auto lazyFork = std::make_unique<MG::LazyForkBehaviour>();
+    auto resultFolder = makeResultsFolder(settings);
+
     auto defaultStrategy(std::make_unique<LM::Strategy>("default", defaultWeight, honest.get()));
 
+    // NOTE: better to use map here but requires getStrategies from model instead of only weights
+    std::vector<std::ofstream> outputStreams;
     learningStrategies.push_back(std::make_unique<LM::Strategy>("petty", defaultWeight, petty.get()));
-    learningStrategies.push_back(std::make_unique<LM::Strategy>("honest", defaultWeight, lazyFork.get()));
+    outputStreams.push_back(std::ofstream(resultFolder + "/petty.txt"));
 
-    //start running games
-    // BlockCount totalBlocksMined(0);
-    // BlockCount blocksInLongestChain(0);
+    learningStrategies.push_back(std::make_unique<LM::Strategy>("lazy-fork", defaultWeight, lazyFork.get()));
+    outputStreams.push_back(std::ofstream(resultFolder + "/lazy-fork.txt"));
 
     std::vector<LM::Strategy *> expLearningStrategies;
     for(auto &s: learningStrategies) {
@@ -76,10 +98,6 @@ void run(RunSettings settings) {
     LM::Exp3 model = LM::Exp3(expLearningStrategies, phi);
     MinerCount numberRandomMiners(settings.totalMiners - settings.fixedDefault);
     std::vector<LM::PlayerProfile> minerProfiles = model.pickStrategiesEvenly(numberRandomMiners);
-
-    // for (auto profile : minerProfiles) {
-    //     std::cout << expLearningStrategies[profile.currentStrategy]->name << std::endl;
-    // }
 
     auto blockchain = std::make_unique<MG::Blockchain>(settings.gameSettings.blockchainSettings);
     auto minerGroup = MG::MinerGroup::build(
@@ -94,13 +112,9 @@ void run(RunSettings settings) {
     auto maxProfit = calculateMaxProfit(settings);
     MG::Game game(settings.gameSettings);
 
-    auto strategyWeights = model.getStrategyWeights();
+    writeWeights(0, model, outputStreams);
 
     for (unsigned int gameNum = 0; gameNum < settings.numberOfGames; gameNum++) {
-
-        // NOTE: for printing
-        // std::vector<StratWeight> strategyWeights = model.getStrategyWeights();
-
         blockchain->reset();
         minerGroup->reset(*blockchain.get());
 
@@ -111,32 +125,11 @@ void run(RunSettings settings) {
         for (size_t i = 0; i < results.minerResults.size(); i++) {
             minerProfiles[i].currentReward = results.minerResults[i].totalProfit;
         }
-
-        strategyWeights = model.getStrategyWeights();
         minerProfiles = model.updateStrategyProfiles(minerProfiles, maxProfit);
-
-        analyse(minerGroup->getLearningMiners(), minerProfiles, strategyWeights);
-
+        writeWeights(gameNum, model, outputStreams);
     }
-    // model->writeWeights(settings.numberOfGames);
 }
 
-void analyse(
-    const std::vector<MG::Miner *> & miners,
-    const std::vector<LM::PlayerProfile> profiles,
-    const std::vector<StratWeight> weights
-) {
-    // for (size_t miner = 0; miner < miners.size(); miner++) {
-    //     std::cout <<
-    //     "strategy = " << miners[miner]->getStrategyName() << " || " <<
-    //     "reward = " << profiles[miner].currentReward << std::endl;
-    // }
-    std::vector<std::string> names{"petty", "lazy-fork"};
-    for (size_t strategy = 0; strategy < weights.size(); strategy++) {
-        std::cout << names[strategy] << "->" << weights[strategy] << "  ||  ";
-    }
-    std::cout << std::endl;
-}
 
 int main(int, const char * []) {
     Value satoshiPerBitcoin(100000000); // search SATOSHI_PER_BITCOIN in original project
@@ -154,7 +147,7 @@ int main(int, const char * []) {
     MG::GameSettings gameSettings = {blockchainSettings};
 
     // RunSettings runSettings = {1000, MinerCount(200), MinerCount(0), gameSettings, "test"};
-    RunSettings runSettings = {1000, MinerCount(200), MinerCount(0), gameSettings, "test"};
+    RunSettings runSettings = {10000, MinerCount(200), MinerCount(0), gameSettings, "results"};
     run(runSettings);
 
 }
