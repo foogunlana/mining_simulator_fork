@@ -39,6 +39,8 @@ namespace mining_game {
         return Value(0);
     }
 
+    // NOTE: calculation of rem is wrong here. Needs to be rem up until current time
+    // This doesn't work because each block is mined at a different time... Though it might work now since there is no network delay
     bool lazyUndercutIsProfitable(const Blockchain & chain) {
         return chain.gap() >= chain.most(chain.frontier()).params.rem;
     }
