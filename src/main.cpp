@@ -12,6 +12,7 @@
 #include "src/mining_game/blockchain.hpp"
 #include "src/mining_game/default_behaviour.hpp"
 #include "src/mining_game/petty_behaviour.hpp"
+#include "src/mining_game/lazy_fork_behaviour.hpp"
 
 #include <vector>
 #include <iostream>
@@ -33,7 +34,11 @@ struct RunSettings {
 
 Value calculateMaxProfit(RunSettings settings);
 void run(RunSettings settings);
-void analyse(const std::vector<MG::Miner *> & miners, std::vector<LM::PlayerProfile> profiles);
+void analyse(
+    const std::vector<MG::Miner *> & miners,
+    const std::vector<LM::PlayerProfile> profiles,
+    const std::vector<StratWeight> weights
+);
 
 Value calculateMaxProfit(RunSettings settings) {
     auto secsPerBlock(settings.gameSettings.blockchainSettings.secondsPerBlock);
@@ -52,10 +57,11 @@ void run(RunSettings settings) {
 
     auto honest = std::make_unique<MG::DefaultBehaviour>();
     auto petty = std::make_unique<MG::PettyBehaviour>();
+    auto lazyFork = std::make_unique<MG::LazyForkBehaviour>();
     auto defaultStrategy(std::make_unique<LM::Strategy>("default", defaultWeight, honest.get()));
 
     learningStrategies.push_back(std::make_unique<LM::Strategy>("petty", defaultWeight, petty.get()));
-    learningStrategies.push_back(std::make_unique<LM::Strategy>("honest", defaultWeight, honest.get()));
+    learningStrategies.push_back(std::make_unique<LM::Strategy>("honest", defaultWeight, lazyFork.get()));
 
     //start running games
     // BlockCount totalBlocksMined(0);
@@ -106,24 +112,30 @@ void run(RunSettings settings) {
             minerProfiles[i].currentReward = results.minerResults[i].totalProfit;
         }
 
-        analyse(minerGroup->getLearningMiners(), minerProfiles);
         strategyWeights = model.getStrategyWeights();
         minerProfiles = model.updateStrategyProfiles(minerProfiles, maxProfit);
+
+        analyse(minerGroup->getLearningMiners(), minerProfiles, strategyWeights);
 
     }
     // model->writeWeights(settings.numberOfGames);
 }
 
-void analyse(const std::vector<MG::Miner *> & miners, std::vector<LM::PlayerProfile> profiles) {
-    for (size_t miner = 0; miner < miners.size(); miner++) {
-        std::cout <<
-        "strategy = " << miners[miner]->getStrategyName() << " || " <<
-        "reward = " << profiles[miner].currentReward << std::endl;
-    }
-    // for (size_t strategy = 0; strategy < weights.size(); strategy++) {
-    //     std::cout << names[strategy] << "->" << weights[strategy] << "  ||  ";
+void analyse(
+    const std::vector<MG::Miner *> & miners,
+    const std::vector<LM::PlayerProfile> profiles,
+    const std::vector<StratWeight> weights
+) {
+    // for (size_t miner = 0; miner < miners.size(); miner++) {
+    //     std::cout <<
+    //     "strategy = " << miners[miner]->getStrategyName() << " || " <<
+    //     "reward = " << profiles[miner].currentReward << std::endl;
     // }
-    // std::cout << std::endl;
+    std::vector<std::string> names{"petty", "lazy-fork"};
+    for (size_t strategy = 0; strategy < weights.size(); strategy++) {
+        std::cout << names[strategy] << "->" << weights[strategy] << "  ||  ";
+    }
+    std::cout << std::endl;
 }
 
 int main(int, const char * []) {
@@ -142,7 +154,7 @@ int main(int, const char * []) {
     MG::GameSettings gameSettings = {blockchainSettings};
 
     // RunSettings runSettings = {1000, MinerCount(200), MinerCount(0), gameSettings, "test"};
-    RunSettings runSettings = {1, MinerCount(200), MinerCount(0), gameSettings, "test"};
+    RunSettings runSettings = {10, MinerCount(200), MinerCount(0), gameSettings, "test"};
     run(runSettings);
 
 }
