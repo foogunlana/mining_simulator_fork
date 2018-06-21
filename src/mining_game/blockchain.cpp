@@ -102,8 +102,7 @@ namespace mining_game {
     }
 
     Value Blockchain::rem(const Block & block, BlockTime at) const {
-        assert(valueNetworkTotal >= block.txFeesInChain);
-        // return block.params.rem + txPooled(at - block.params.minedAt);
+        assert((valueNetworkTotal - block.txFeesInChain) == (block.params.rem + txPooled(at - block.params.minedAt)));
         return valueNetworkTotal - block.txFeesInChain;
     }
 

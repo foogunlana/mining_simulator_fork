@@ -35,6 +35,7 @@ namespace mining_game {
         auto genesis = std::make_unique<Block>(params);
         blockchain.addBlock(std::move(genesis));
 
+
         do {
             currentTime = minerGroup.nextTimeBlockFound();
             blockchain.advanceToTime(currentTime);
@@ -50,19 +51,46 @@ namespace mining_game {
         auto winningChain = winningBlock.getChain();
 
         int parentCount = 0;
+        // int pettyCount = 0;
+        // int lazyCount = 0;
         Profit totalValue(0);
+        // std::vector<std::string> winners;
+        // winners.resize(winningBlock.height);
 
         for (auto mined : winningChain) {
             if (mined->height == BlockHeight(0)) {
                 break;
             }
+            // winners[mined->height] = mined->miner->getStrategyName();
             if (mined->parent->miner == mined->miner) {
                 parentCount++;
             }
             auto &miner = *(mined->miner);
             minerResults[miner.params.number].addBlock(mined);
             totalValue += mined->realValue();
+
+            // if (miner.getStrategyName() == "petty") {
+            //     pettyCount++;
+            // } else if (miner.getStrategyName() == "lazy-fork") {
+            //     lazyCount++;
+            // }
         }
+
+        // for (size_t h = 1; h < blockchain.getMaxHeightPub(); h++) {
+        //     int pettyBlockCount = 0;
+        //     int lazyBlockCount = 0;
+        //     const std::vector<std::unique_ptr<Block>> & blocks = blockchain.frontier(h);
+        //     for (const std::unique_ptr<Block> &block : blocks) {
+        //         if (block->miner->getStrategyName() == "petty") {
+        //             pettyBlockCount++;
+        //         } else if (block->miner->getStrategyName() == "lazy-fork") {
+        //             lazyBlockCount++;
+        //         }
+        //         std::cout << *block << std::endl;
+        //     }
+        //     std::cout << "winner=" << winners[h] << std::endl;
+        // }
+        // std::cout << "lazyFork=" << lazyCount << " & petty=" << pettyCount << std::endl;
 
        // std::cout << parentCount << " block mined over parent" << std::endl;
         //calculate the score at the end
