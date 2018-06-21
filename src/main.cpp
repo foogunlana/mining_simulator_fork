@@ -86,14 +86,14 @@ void run(RunSettings settings) {
     // NOTE: better to use map here but requires getStrategies from model instead of only weights
     std::vector<std::ofstream> outputStreams;
 
-    learningStrategies.push_back(std::make_unique<LM::Strategy>("payforward", defaultWeight, payforward.get()));
-    outputStreams.push_back(std::ofstream(resultFolder + "/payforward.txt"));
+    // learningStrategies.push_back(std::make_unique<LM::Strategy>("payforward", defaultWeight, payforward.get()));
+    // outputStreams.push_back(std::ofstream(resultFolder + "/payforward.txt"));
 
     learningStrategies.push_back(std::make_unique<LM::Strategy>("lazy-fork", defaultWeight, lazyFork.get()));
     outputStreams.push_back(std::ofstream(resultFolder + "/lazy-fork.txt"));
 
-    // learningStrategies.push_back(std::make_unique<LM::Strategy>("petty", defaultWeight, petty.get()));
-    // outputStreams.push_back(std::ofstream(resultFolder + "/petty.txt"));
+    learningStrategies.push_back(std::make_unique<LM::Strategy>("petty", defaultWeight, petty.get()));
+    outputStreams.push_back(std::ofstream(resultFolder + "/petty.txt"));
 
     std::vector<LM::Strategy *> expLearningStrategies;
     for(auto &s: learningStrategies) {
@@ -141,7 +141,7 @@ int main(int, const char * []) {
     Value satoshiPerBitcoin(100000000); // search SATOSHI_PER_BITCOIN in original project
     BlockCount expectedNumberOfBlocks(10000); // EXPECTED_NUMBER_OF_BLOCKS
     BlockRate expectedTimeToFindBlock(600); // SEC_PER_BLOCK
-    BlockValue blockReward(0 * satoshiPerBitcoin); // BLOCK_REWARD
+    BlockValue blockReward(100 * satoshiPerBitcoin); // BLOCK_REWARD
     BlockValue transactionFeeRate((50 * satoshiPerBitcoin)/expectedTimeToFindBlock);  //TRANSACTION_FEE_RATE
     Value payforward(0);
 

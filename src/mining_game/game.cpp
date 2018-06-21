@@ -28,7 +28,7 @@ namespace mining_game {
             BlockTime(0),
             BlockTime(0),
             Value(0),
-            Value(0),
+            blockchainSettings.blockReward,
             Value(0),
             Value(0),
         };
