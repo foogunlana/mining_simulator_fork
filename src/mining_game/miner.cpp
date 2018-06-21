@@ -52,6 +52,7 @@ namespace mining_game {
         // chain.rem includes the remainder from parent, pay forward and any tx inbetween until 'now'
         Value txFeesAvailable = chain.rem(parent, now);
         Value txFees = strategy.get().behaviour->collectFees(chain, *this, parent, txFeesAvailable);
+        Value payforward = strategy.get().behaviour->payForward(chain, *this, parent, txFees);
 
         _blocksMinedTotal++;
         _nextMiningTime += utils::selectMiningOffset(chain.chanceToWin(params.hashRate));
@@ -59,7 +60,6 @@ namespace mining_game {
         assert(now > parent.params.minedAt);
 
         Value rem = txFeesAvailable - txFees;
-        Value payforward = Value(0);
         BlockTime publishedAt = now;
         BlockTime minedAt = now;
 

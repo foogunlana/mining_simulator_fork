@@ -16,7 +16,7 @@ namespace mining_game {
         Value txFees;
         Value fixedReward;
         Value rem;
-        Value payForward;
+        Value payforward;
     };
 
     class Block {

@@ -19,6 +19,7 @@ namespace mining_game {
         secondsPerBlock(blockchainSettings.secondsPerBlock),
         transactionFeeRate(blockchainSettings.transactionFeeRate),
         _maxHeightPub(0),
+        maxPayforwardValidHeight(0),
         payforward(blockchainSettings.payforward)
     {
         // _blocks.reserve(rawCount(blockchainSettings.numberOfBlocks) * 2);
@@ -41,6 +42,7 @@ namespace mining_game {
         valueNetworkTotal = Value(0);
         timeInSecs = BlockTime(0);
         _maxHeightPub = BlockHeight(0);
+        maxPayforwardValidHeight = BlockHeight(0);
         oldBlocks.reserve(oldBlocks.size() + blocks.size());
         for (auto &siblings : blocks) {
             for (auto &block : siblings) {
@@ -74,6 +76,10 @@ namespace mining_game {
     void Blockchain::addBlock(std::unique_ptr<Block> block) {
         size_t height = block->height;
         _maxHeightPub = height > _maxHeightPub ? height : _maxHeightPub;
+        if (block->params.payforward >= payforward) {
+            maxPayforwardValidHeight = block->height > maxPayforwardValidHeight ?
+                block->height : maxPayforwardValidHeight;
+        }
         blocks[height].push_back(std::move(block));
     }
 
@@ -104,8 +110,10 @@ namespace mining_game {
 
     Value Blockchain::rem(const Block & block, BlockTime at) const {
         auto expectedRem = block.params.rem + txPooled(at - block.params.minedAt);
-        assert(expectedRem == valueNetworkTotal - block.txFeesInChain);
-        return block.params.payForward + expectedRem;
+        // NOTE: the assert below doesn't work with non-zero payforward since it
+        // can be included in the txFeesInChain if the last miner takes PF as txFees
+        // assert(expectedRem == valueNetworkTotal - block.txFeesInChain);
+        return block.params.payforward + expectedRem;
     }
 
     Value Blockchain::gap() const {

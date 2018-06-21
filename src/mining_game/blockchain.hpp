@@ -29,6 +29,7 @@ namespace mining_game {
         std::vector<std::vector<std::unique_ptr<Block>>> blocks;
         std::vector<std::unique_ptr<Block>> oldBlocks;
     public:
+        size_t maxPayforwardValidHeight;
         Value payforward;
 
         Blockchain(BlockchainSettings blockchainSettings);

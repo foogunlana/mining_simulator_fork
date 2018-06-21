@@ -30,7 +30,7 @@ namespace mining_game {
             Value(0),
             blockchainSettings.blockReward,
             Value(0),
-            Value(0),
+            blockchainSettings.payforward,
         };
         auto genesis = std::make_unique<Block>(params);
         blockchain.addBlock(std::move(genesis));
@@ -51,7 +51,7 @@ namespace mining_game {
         auto winningChain = winningBlock.getChain();
 
         int parentCount = 0;
-        // int pettyCount = 0;
+        // int payforwardCount = 0;
         // int lazyCount = 0;
         Profit totalValue(0);
         // std::vector<std::string> winners;
@@ -69,20 +69,20 @@ namespace mining_game {
             minerResults[miner.params.number].addBlock(mined);
             totalValue += mined->realValue();
 
-            // if (miner.getStrategyName() == "petty") {
-            //     pettyCount++;
+            // if (miner.getStrategyName() == "payforward") {
+            //     payforwardCount++;
             // } else if (miner.getStrategyName() == "lazy-fork") {
             //     lazyCount++;
             // }
         }
 
         // for (size_t h = 1; h < blockchain.getMaxHeightPub(); h++) {
-        //     int pettyBlockCount = 0;
+        //     int payforwardBlockCount = 0;
         //     int lazyBlockCount = 0;
         //     const std::vector<std::unique_ptr<Block>> & blocks = blockchain.frontier(h);
         //     for (const std::unique_ptr<Block> &block : blocks) {
-        //         if (block->miner->getStrategyName() == "petty") {
-        //             pettyBlockCount++;
+        //         if (block->miner->getStrategyName() == "payforward") {
+        //             payforwardBlockCount++;
         //         } else if (block->miner->getStrategyName() == "lazy-fork") {
         //             lazyBlockCount++;
         //         }
@@ -90,7 +90,7 @@ namespace mining_game {
         //     }
         //     std::cout << "winner=" << winners[h] << std::endl;
         // }
-        // std::cout << "lazyFork=" << lazyCount << " & petty=" << pettyCount << std::endl;
+        // std::cout << "lazyFork=" << lazyCount << " & payforward=" << payforwardCount << std::endl;
 
        // std::cout << parentCount << " block mined over parent" << std::endl;
         //calculate the score at the end
@@ -104,7 +104,7 @@ namespace mining_game {
             finalBlocks += minerResults[i].blocksInWinningChain;
         }
 
-        Value moneyLeftAtEnd = winningBlock.params.rem + winningBlock.params.payForward;
+        Value moneyLeftAtEnd = winningBlock.params.rem + winningBlock.params.payforward;
 
         GameResult result(minerResults, totalBlocks, finalBlocks, moneyLeftAtEnd, totalValue);
 

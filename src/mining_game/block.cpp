@@ -21,7 +21,7 @@ namespace mining_game {
         valueInChain = parent->valueInChain + params.txFees + params.fixedReward;
         txFeesInChain = parent->txFeesInChain + params.txFees;
         gain = params.txFees + params.fixedReward;
-        loss = params.payForward;
+        loss = params.payforward;
     }
 
     void Block::reset(Block *parent_, Miner * miner_, BlockParameters params_) {
@@ -32,7 +32,7 @@ namespace mining_game {
         valueInChain = parent->valueInChain + params.txFees + params.fixedReward;
         txFeesInChain = parent->txFeesInChain + params.txFees;
         gain = params.txFees + params.fixedReward;
-        loss = params.payForward;
+        loss = params.payforward;
     }
 
     Profit Block::realValue() const {

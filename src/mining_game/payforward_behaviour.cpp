@@ -20,7 +20,13 @@ namespace mining_game {
     PayforwardBehaviour::PayforwardBehaviour() : learning_model::Behaviour() {}
 
     Block & PayforwardBehaviour::chooseParent(const Blockchain & chain, const Miner & miner) const {
-        return firstPayforwardValidBlock(chain);
+        const std::vector<std::unique_ptr<Block>> & possiblities = chain.frontier(chain.maxPayforwardValidHeight);
+        for (auto &block : possiblities) {
+            if (block->params.payforward >= chain.payforward) {
+                return *block.get();
+            }
+        }
+        return *chain.frontier(0)[0].get();
     }
 
     // Block & publish(const Blockchain & chain, const & miner) const {
@@ -33,27 +39,5 @@ namespace mining_game {
 
     Value PayforwardBehaviour::payForward(const Blockchain & chain, const Miner & miner, const Block & parent, Value fees) const {
         return parent.params.payforward;
-    }
-
-    Block & firstPayforwardValidBlock(const Blockchain & blockchain) {
-        bool invalidSoFar = true;
-        size_t height = blockchain.getMaxHeightPub();
-        std::vector<Block *> possiblities;
-        while (invalidSoFar) {
-            if (height == 0) {
-                return *blockchain.frontier(0)[0].get();
-            }
-            for (auto &block : blockchain.frontier(height)) {
-                if (block->params.payforward == blockchain.payforward) {
-                    // valid
-                    possiblities.push_back(block.get());
-                    invalidSoFar = false;
-                } else {
-                    std::cout << "invalid!" << std::endl;
-                }
-            }
-            height--;
-        }
-        return *possiblities[utils::selectRandomIndex(possiblities.size())];
     }
 }
