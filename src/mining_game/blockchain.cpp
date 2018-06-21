@@ -107,7 +107,7 @@ namespace mining_game {
     }
 
     Value Blockchain::gap() const {
-        return mostRem(frontier()) - mostRem(frontier(-1));
+        return mostRem(frontier(-1)) - mostRem(frontier());
     }
 
     Block & Blockchain::most(const std::vector<std::unique_ptr<Block>> & blocks) const {
