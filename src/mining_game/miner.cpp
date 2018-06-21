@@ -59,7 +59,7 @@ namespace mining_game {
         assert(now > parent.params.minedAt);
 
         Value rem = txFeesAvailable - txFees;
-        Value payForward = Value(0);
+        Value payforward = Value(0);
         BlockTime publishedAt = now;
         BlockTime minedAt = now;
 
@@ -69,7 +69,7 @@ namespace mining_game {
             txFees,
             parent.params.fixedReward,
             rem,
-            payForward
+            payforward
         };
         return chain.createBlock(&parent, this, blockParams);
     }

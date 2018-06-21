@@ -18,7 +18,8 @@ namespace mining_game {
         timeInSecs(0),
         secondsPerBlock(blockchainSettings.secondsPerBlock),
         transactionFeeRate(blockchainSettings.transactionFeeRate),
-        _maxHeightPub(0)
+        _maxHeightPub(0),
+        payforward(blockchainSettings.payforward)
     {
         // _blocks.reserve(rawCount(blockchainSettings.numberOfBlocks) * 2);
         blocks.resize(rawCount(blockchainSettings.numberOfBlocks) * 2);

@@ -29,6 +29,8 @@ namespace mining_game {
         std::vector<std::vector<std::unique_ptr<Block>>> blocks;
         std::vector<std::unique_ptr<Block>> oldBlocks;
     public:
+        Value payforward;
+
         Blockchain(BlockchainSettings blockchainSettings);
 
         void reset();

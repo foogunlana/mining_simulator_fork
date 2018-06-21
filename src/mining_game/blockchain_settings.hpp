@@ -15,6 +15,7 @@ namespace mining_game {
         ValueRate transactionFeeRate;
         BlockValue blockReward;
         BlockCount numberOfBlocks;
+        Value payforward;
     };
 }
 
