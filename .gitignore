@@ -2,3 +2,4 @@ test
 run
 *.dSYM
 *.o
+results-*
