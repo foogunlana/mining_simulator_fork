@@ -66,7 +66,7 @@ namespace mining_game {
             os << "[";
         }
 
-        os << "h:" << height << ", m:" << *miner << ", tx:" << params.txFees << ", t:" << params.minedAt;
+        os << "h:" << height << ", m:" << *miner << ", tx:" << params.txFees << ", t:" << params.minedAt << ", r:" << params.rem;
 
         if (isPublished) {
             os << "}->";
