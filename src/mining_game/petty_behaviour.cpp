@@ -25,11 +25,11 @@ namespace mining_game {
     //
     // }
 
-    Value PettyBehaviour::collectFees(const Blockchain & chain, const Miner & miner, const Block & block, Value txFeesAvailable) const {
+    Value PettyBehaviour::collectFees(const Blockchain & chain, const Miner & miner, const Block & parent, Value txFeesAvailable) const {
         return txFeesAvailable;
     }
 
-    Value PettyBehaviour::payForward(const Blockchain & chain, const Miner & miner, const Block & block, Value fees) const {
+    Value PettyBehaviour::payForward(const Blockchain & chain, const Miner & miner, const Block & parent, Value fees) const {
         return Value(0);
     }
 }
