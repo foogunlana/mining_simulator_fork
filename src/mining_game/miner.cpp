@@ -49,7 +49,8 @@ namespace mining_game {
     std::unique_ptr<Block> Miner::mine(Blockchain &chain, BlockTime now) {
         Block &parent = strategy.get().behaviour->chooseParent(chain, *this);
 
-        Value txFeesAvailable = chain.rem(parent, now) + parent.params.payForward;
+        // chain.rem includes the remainder from parent, pay forward and any tx inbetween until 'now'
+        Value txFeesAvailable = chain.rem(parent, now);
         Value txFees = strategy.get().behaviour->collectFees(chain, *this, parent, txFeesAvailable);
 
         _blocksMinedTotal++;
