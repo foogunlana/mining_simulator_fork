@@ -1,6 +1,8 @@
 
 #include "block.hpp"
+#include "miner.hpp"
 
+#include <iostream>
 
 namespace mining_game {
 
@@ -8,6 +10,7 @@ namespace mining_game {
         miner(nullptr), parent(nullptr), params(params_), height(size_t(0))
     {
         valueInChain = Value(0);
+        txFeesInChain = params.txFees;
         gain = Value(0);
         loss = Value(0);
     }
@@ -16,6 +19,7 @@ namespace mining_game {
         miner(miner_), parent(parent_), params(params_), height(parent_->height + size_t(1))
     {
         valueInChain = parent->valueInChain + params.txFees + params.fixedReward;
+        txFeesInChain = parent->txFeesInChain + params.txFees;
         gain = params.txFees + params.fixedReward;
         loss = params.payForward;
     }
@@ -26,6 +30,7 @@ namespace mining_game {
         miner = miner_;
         params = params_;
         valueInChain = parent->valueInChain + params.txFees + params.fixedReward;
+        txFeesInChain = parent->txFeesInChain + params.txFees;
         gain = params.txFees + params.fixedReward;
         loss = params.payForward;
     }
@@ -42,5 +47,32 @@ namespace mining_game {
             current = current->parent;
         }
         return chain;
+    }
+
+    std::ostream& operator<< (std::ostream& out, const Block& mc) {
+        mc.print(out, true);
+        return out;
+    }
+
+    void Block::print(std::ostream& os, bool isPublished) const {
+        if (height == BlockHeight(0)) {
+            os << "[h:0, m:gen]";
+            return;
+        }
+        if (isPublished) {
+            os << "{";
+        }
+        else {
+            os << "[";
+        }
+
+        os << "h:" << height << ", m:" << *miner << ", tx:" << params.txFees << ", t:" << params.minedAt;
+
+        if (isPublished) {
+            os << "}->";
+        }
+        else {
+            os << "]->";
+        }
     }
 }
