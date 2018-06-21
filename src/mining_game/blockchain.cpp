@@ -97,23 +97,39 @@ namespace mining_game {
         return hashRate / secondsPerBlock;
     }
 
-    Value Blockchain::gap() const {
-        return most(frontier()).params.rem - most(frontier(-1)).params.rem;
+    Value Blockchain::rem(const Block & block) const {
+        return rem(block, getTime());
     }
 
-    Block & Blockchain::most(const std::vector<std::unique_ptr<Block>> & blocks) {
-        Value maxRem(0);
-        for (const auto &block : blocks) {
-            maxRem = block->params.rem > maxRem ? block->params.rem : maxRem;
-        }
+    Value Blockchain::rem(const Block & block, BlockTime at) const {
+        assert(valueNetworkTotal >= block.txFeesInChain);
+        // return block.params.rem + txPooled(at - block.params.minedAt);
+        return valueNetworkTotal - block.txFeesInChain;
+    }
+
+    Value Blockchain::gap() const {
+        return mostRem(frontier()) - mostRem(frontier(-1));
+    }
+
+    Block & Blockchain::most(const std::vector<std::unique_ptr<Block>> & blocks) const {
+        Value maxRem = mostRem(blocks);
         std::vector<Block *> possiblities;
         for (const auto &block : blocks) {
-            if (block->params.rem == maxRem) {
+            if (rem(*block.get()) == maxRem) {
                 possiblities.push_back(block.get());
             }
         }
         size_t index = utils::selectRandomIndex(possiblities.size());
         Block *block = possiblities[index];
         return *block;
+    }
+
+    Value Blockchain::mostRem(const std::vector<std::unique_ptr<Block>> & blocks) const {
+        Value maxRem(0);
+        for (const auto &block : blocks) {
+            auto r = rem(*block.get());
+            maxRem = r > maxRem ? r : maxRem;
+        }
+        return maxRem;
     }
 }

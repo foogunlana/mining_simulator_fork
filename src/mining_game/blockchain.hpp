@@ -47,8 +47,10 @@ namespace mining_game {
         BlockTime getMaxHeightPub() const { return _maxHeightPub; };
 
         Value gap() const;
-
-        static Block & most(const std::vector<std::unique_ptr<Block>> & blocks);
+        Value rem(const Block & block) const;
+        Value rem(const Block & block, BlockTime atTime) const;
+        Block & most(const std::vector<std::unique_ptr<Block>> & blocks) const;
+        Value mostRem(const std::vector<std::unique_ptr<Block>> & blocks) const;
     };
 }
 
