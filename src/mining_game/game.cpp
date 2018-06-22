@@ -55,7 +55,7 @@ namespace mining_game {
         int lazyCount = 0;
         Profit totalValue(0);
         std::vector<std::string> winners;
-        winners.resize(winningBlock.height);
+        winners.resize(winningBlock.height+1);
 
         for (auto mined : winningChain) {
             if (mined->height == BlockHeight(0)) {

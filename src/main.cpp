@@ -42,8 +42,14 @@ Value calculateMaxProfit(RunSettings settings);
 void run(RunSettings settings);
 void writeWeights(unsigned int gameNum, LM::Exp3 model, std::vector<std::ofstream> & outputStreams);
 
+// ********** PARSER *************** //
 struct Args {
     unsigned int numGames;
+    unsigned int txFees1Block;
+    unsigned int blockReward;
+    unsigned int payforward;
+    unsigned int minerCount;
+    unsigned int defaultMinerCount;
     bool commentary;
 };
 struct Parser {
@@ -54,19 +60,36 @@ struct Parser {
         try {
             cxxopts::Options options(argv[0], " - command line options");
             options
-            .positional_help("[-n --ngames], [-c --commentary]")
-            .show_positional_help();
+                .positional_help("[-n --ngames], [-c --commentary]")
+                .show_positional_help();
 
             options
-            .add_options()
-            ("n,ngames", "number of games", cxxopts::value<unsigned int>()
-                ->default_value("10"))
-            ("c,commentary", "turn on commentary on games")
+                .add_options()
+                ("n,ngames", "number of games", cxxopts::value<unsigned int>()
+                    ->default_value("1"))
+                ("x,tx", "expected tx fees in one block", cxxopts::value<unsigned int>()
+                    ->default_value("50"))
+                ("r,reward", "initial block reward", cxxopts::value<unsigned int>()
+                    ->default_value("0"))
+                ("p,payforward", "initial pay forward", cxxopts::value<unsigned int>()
+                    ->default_value("0"))
+                ("m,miners", "number of miners", cxxopts::value<unsigned int>()
+                    ->default_value("200"))
+                ("d,default-miners", "number of default miners", cxxopts::value<unsigned int>()
+                    ->default_value("0"))
+                ("c,commentary", "turn on commentary on games")
             ;
 
             auto result = options.parse(argc, argv);
+
             args.numGames = result["n"].as<unsigned int>();
+            args.txFees1Block = result["x"].as<unsigned int>();
+            args.blockReward = result["r"].as<unsigned int>();
+            args.payforward = result["p"].as<unsigned int>();
+            args.minerCount = result["m"].as<unsigned int>();
+            args.defaultMinerCount = result["d"].as<unsigned int>();
             args.commentary = result.count("c") > 0;
+
         } catch (const cxxopts::OptionException& e) {
             std::cout << "error parsing options: " << e.what() << std::endl;
             exit(1);
@@ -74,7 +97,7 @@ struct Parser {
         return args;
     }
 };
-
+ // ******** PARSER *********** //
 
 void writeWeights(unsigned int gameNum, LM::Exp3 model, std::vector<std::ofstream> & outputStreams) {
     auto strategyWeights = model.getStrategyWeights();
@@ -162,7 +185,10 @@ void run(RunSettings settings) {
         minerGroup->updateLearningMinerStrategies(minerProfiles);
         auto results = game.run(*minerGroup.get(), *blockchain.get());
 
-        assert(results.minerResults.size() == minerProfiles.size());
+        // NOTE: implicit assumption that the first n miners are learners
+        // where n is the number of learning miners! Do not change without
+        // considering that.
+        assert(results.minerResults.size() >= minerProfiles.size());
         for (size_t i = 0; i < results.minerResults.size(); i++) {
             minerProfiles[i].currentReward = results.minerResults[i].totalProfit;
         }
@@ -179,9 +205,9 @@ int main(int argc, char * argv[]) {
     Value satoshiPerBitcoin(100000000); // search SATOSHI_PER_BITCOIN in original project
     BlockCount expectedNumberOfBlocks(10000); // EXPECTED_NUMBER_OF_BLOCKS
     BlockRate expectedTimeToFindBlock(600); // SEC_PER_BLOCK
-    BlockValue blockReward(0 * satoshiPerBitcoin); // BLOCK_REWARD
-    BlockValue transactionFeeRate((50 * satoshiPerBitcoin)/expectedTimeToFindBlock);  //TRANSACTION_FEE_RATE
-    Value payforward(50 * satoshiPerBitcoin);
+    BlockValue blockReward(args.blockReward * satoshiPerBitcoin); // BLOCK_REWARD
+    BlockValue transactionFeeRate((args.txFees1Block * satoshiPerBitcoin)/expectedTimeToFindBlock);  //TRANSACTION_FEE_RATE
+    Value payforward(args.payforward * satoshiPerBitcoin);
 
     MG::BlockchainSettings blockchainSettings = {
         expectedTimeToFindBlock,
@@ -193,6 +219,6 @@ int main(int argc, char * argv[]) {
 
     MG::GameSettings gameSettings = {blockchainSettings, args.commentary};
     // RunSettings runSettings = {1000, MinerCount(200), MinerCount(0), gameSettings, "test"};
-    RunSettings runSettings = {args.numGames, MinerCount(200), MinerCount(0), gameSettings, "results"};
+    RunSettings runSettings = {args.numGames, args.minerCount, args.defaultMinerCount, gameSettings, "results"};
     run(runSettings);
 }
