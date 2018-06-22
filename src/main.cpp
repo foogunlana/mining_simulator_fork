@@ -152,7 +152,8 @@ int main(int, const char * []) {
         expectedNumberOfBlocks,
         payforward
     };
-    MG::GameSettings gameSettings = {blockchainSettings};
+    bool commentary(true);
+    MG::GameSettings gameSettings = {blockchainSettings, commentary};
 
     // RunSettings runSettings = {1000, MinerCount(200), MinerCount(0), gameSettings, "test"};
     RunSettings runSettings = {1000, MinerCount(200), MinerCount(0), gameSettings, "results"};

@@ -17,7 +17,7 @@
 
 namespace mining_game {
 
-    Game::Game(GameSettings settings_): blockchainSettings(settings_.blockchainSettings) {}
+    Game::Game(GameSettings settings_): blockchainSettings(settings_.blockchainSettings), commentary(settings_.commentaryOn) {}
 
     GameResult Game::run(MinerGroup &minerGroup, Blockchain &blockchain) {
 
@@ -51,17 +51,17 @@ namespace mining_game {
         auto winningChain = winningBlock.getChain();
 
         int parentCount = 0;
-        // int payforwardCount = 0;
-        // int lazyCount = 0;
+        int payforwardCount = 0;
+        int lazyCount = 0;
         Profit totalValue(0);
-        // std::vector<std::string> winners;
-        // winners.resize(winningBlock.height);
+        std::vector<std::string> winners;
+        winners.resize(winningBlock.height);
 
         for (auto mined : winningChain) {
             if (mined->height == BlockHeight(0)) {
                 break;
             }
-            // winners[mined->height] = mined->miner->getStrategyName();
+            winners[mined->height] = mined->miner->getStrategyName();
             if (mined->parent->miner == mined->miner) {
                 parentCount++;
             }
@@ -69,28 +69,30 @@ namespace mining_game {
             minerResults[miner.params.number].addBlock(mined);
             totalValue += mined->realValue();
 
-            // if (miner.getStrategyName() == "payforward") {
-            //     payforwardCount++;
-            // } else if (miner.getStrategyName() == "lazy-fork") {
-            //     lazyCount++;
-            // }
+            if (miner.getStrategyName() == "payforward") {
+                payforwardCount++;
+            } else if (miner.getStrategyName() == "lazy-fork") {
+                lazyCount++;
+            }
         }
 
-        // for (size_t h = 1; h < blockchain.getMaxHeightPub(); h++) {
-        //     int payforwardBlockCount = 0;
-        //     int lazyBlockCount = 0;
-        //     const std::vector<std::unique_ptr<Block>> & blocks = blockchain.frontier(h);
-        //     for (const std::unique_ptr<Block> &block : blocks) {
-        //         if (block->miner->getStrategyName() == "payforward") {
-        //             payforwardBlockCount++;
-        //         } else if (block->miner->getStrategyName() == "lazy-fork") {
-        //             lazyBlockCount++;
-        //         }
-        //         std::cout << *block << std::endl;
-        //     }
-        //     std::cout << "winner=" << winners[h] << std::endl;
-        // }
-        // std::cout << "lazyFork=" << lazyCount << " & payforward=" << payforwardCount << std::endl;
+        for (size_t h = 1; h < blockchain.getMaxHeightPub(); h++) {
+            int payforwardBlockCount = 0;
+            int lazyBlockCount = 0;
+            const std::vector<std::unique_ptr<Block>> & blocks = blockchain.frontier(h);
+            for (const std::unique_ptr<Block> &block : blocks) {
+                if (block->miner->getStrategyName() == "payforward") {
+                    payforwardBlockCount++;
+                } else if (block->miner->getStrategyName() == "lazy-fork") {
+                    lazyBlockCount++;
+                }
+                if (commentaryOn) std::cout << *block << std::endl;
+            }
+            if (commentaryOn) std::cout << "winner=" << winners[h] << std::endl;
+        }
+        if (commentaryOn) std::cout << "Blocks in winning chain: lazyFork=" << lazyCount << " & payforward=" << payforwardCount << std::endl <<
+        "value in winning chain=" << winningBlock.valueInChain << std::endl <<
+        "expected value=" << endTime * blockchainSettings.transactionFeeRate << std::endl;
 
        // std::cout << parentCount << " block mined over parent" << std::endl;
         //calculate the score at the end
