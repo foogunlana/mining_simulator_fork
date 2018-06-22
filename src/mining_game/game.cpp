@@ -17,7 +17,7 @@
 
 namespace mining_game {
 
-    Game::Game(GameSettings settings_): blockchainSettings(settings_.blockchainSettings), commentary(settings_.commentaryOn) {}
+    Game::Game(GameSettings settings_): blockchainSettings(settings_.blockchainSettings), commentaryOn(settings_.commentary) {}
 
     GameResult Game::run(MinerGroup &minerGroup, Blockchain &blockchain) {
 

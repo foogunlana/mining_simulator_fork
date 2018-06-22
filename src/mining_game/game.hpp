@@ -15,6 +15,7 @@ namespace mining_game {
 
     struct GameSettings {
         BlockchainSettings blockchainSettings;
+        bool commentary;
     };
 
     class MinerGroup;
@@ -22,6 +23,7 @@ namespace mining_game {
     class Game {
     private:
         BlockchainSettings blockchainSettings;
+        bool commentaryOn;
     public:
         Game(GameSettings settings);
         GameResult run(MinerGroup &minerGroup, Blockchain &blockchain);
