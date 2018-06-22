@@ -64,23 +64,28 @@ struct Parser {
                 .show_positional_help();
 
             options
-                .add_options()
-                ("n,ngames", "number of games", cxxopts::value<unsigned int>()
-                    ->default_value("1"))
-                ("x,tx", "expected tx fees in one block", cxxopts::value<unsigned int>()
+                .add_options("commands")
+                ("h,help", "Print help")
+                ("n,ngames", "number of games in epoch", cxxopts::value<unsigned int>()
+                    ->default_value("10000"))
+                ("x,tx", "expected tx fees gathered in one block", cxxopts::value<unsigned int>()
                     ->default_value("50"))
-                ("r,reward", "initial block reward", cxxopts::value<unsigned int>()
+                ("r,reward", "block reward", cxxopts::value<unsigned int>()
                     ->default_value("0"))
-                ("p,payforward", "initial pay forward", cxxopts::value<unsigned int>()
+                ("p,payforward", "initial pay forward to first block", cxxopts::value<unsigned int>()
                     ->default_value("0"))
                 ("m,miners", "number of miners", cxxopts::value<unsigned int>()
                     ->default_value("200"))
-                ("d,default-miners", "number of default miners", cxxopts::value<unsigned int>()
+                ("d,default-miners", "number of miners using honest strategy", cxxopts::value<unsigned int>()
                     ->default_value("0"))
                 ("c,commentary", "turn on commentary on games")
             ;
 
             auto result = options.parse(argc, argv);
+            if (result.count("help")) {
+                std::cout << options.help({"", "commands"}) << std::endl;
+                exit(0);
+            }
 
             args.numGames = result["n"].as<unsigned int>();
             args.txFees1Block = result["x"].as<unsigned int>();
