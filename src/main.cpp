@@ -15,6 +15,8 @@
 #include "src/mining_game/lazy_fork_behaviour.hpp"
 #include "src/mining_game/payforward_behaviour.hpp"
 
+#include "lib/cxxopts/cxxopts.hpp"
+
 #include <vector>
 #include <iostream>
 #include <fstream>
@@ -39,6 +41,39 @@ std::string makeResultsFolder(RunSettings settings);
 Value calculateMaxProfit(RunSettings settings);
 void run(RunSettings settings);
 void writeWeights(unsigned int gameNum, LM::Exp3 model, std::vector<std::ofstream> & outputStreams);
+
+struct Args {
+    unsigned int numGames;
+    bool commentary;
+};
+struct Parser {
+    Parser() {};
+    Args parse (int argc, char * argv[]) {
+        Args args;
+
+        try {
+            cxxopts::Options options(argv[0], " - command line options");
+            options
+            .positional_help("[-n --ngames], [-c --commentary]")
+            .show_positional_help();
+
+            options
+            .add_options()
+            ("n,ngames", "number of games", cxxopts::value<unsigned int>()
+                ->default_value("10"))
+            ("c,commentary", "turn on commentary on games")
+            ;
+
+            auto result = options.parse(argc, argv);
+            args.numGames = result["n"].as<unsigned int>();
+            args.commentary = result.count("c") > 0;
+        } catch (const cxxopts::OptionException& e) {
+            std::cout << "error parsing options: " << e.what() << std::endl;
+            exit(1);
+        }
+        return args;
+    }
+};
 
 
 void writeWeights(unsigned int gameNum, LM::Exp3 model, std::vector<std::ofstream> & outputStreams) {
@@ -137,7 +172,10 @@ void run(RunSettings settings) {
 }
 
 
-int main(int, const char * []) {
+int main(int argc, char * argv[]) {
+    auto parser = Parser();
+    auto args = parser.parse(argc, argv);
+
     Value satoshiPerBitcoin(100000000); // search SATOSHI_PER_BITCOIN in original project
     BlockCount expectedNumberOfBlocks(10000); // EXPECTED_NUMBER_OF_BLOCKS
     BlockRate expectedTimeToFindBlock(600); // SEC_PER_BLOCK
@@ -152,11 +190,9 @@ int main(int, const char * []) {
         expectedNumberOfBlocks,
         payforward
     };
-    bool commentary(true);
-    MG::GameSettings gameSettings = {blockchainSettings, commentary};
 
+    MG::GameSettings gameSettings = {blockchainSettings, args.commentary};
     // RunSettings runSettings = {1000, MinerCount(200), MinerCount(0), gameSettings, "test"};
-    RunSettings runSettings = {1000, MinerCount(200), MinerCount(0), gameSettings, "results"};
+    RunSettings runSettings = {args.numGames, MinerCount(200), MinerCount(0), gameSettings, "results"};
     run(runSettings);
-
 }
