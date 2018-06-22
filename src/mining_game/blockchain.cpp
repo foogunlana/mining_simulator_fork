@@ -76,11 +76,15 @@ namespace mining_game {
     void Blockchain::addBlock(std::unique_ptr<Block> block) {
         size_t height = block->height;
         _maxHeightPub = height > _maxHeightPub ? height : _maxHeightPub;
-        if (block->params.payforward >= payforward) {
+        if (payforwardValid(*block.get())) {
             maxPayforwardValidHeight = block->height > maxPayforwardValidHeight ?
                 block->height : maxPayforwardValidHeight;
         }
         blocks[height].push_back(std::move(block));
+    }
+
+    bool Blockchain::payforwardValid(const Block & block) const {
+        return block.params.payforward >= payforward;
     }
 
     Value Blockchain::txPooled(BlockTime period) const {

@@ -43,6 +43,7 @@ namespace mining_game {
         Value txPooled(BlockTime period) const;
         TimeRate chanceToWin(HashRate hashRate) const;
 
+        bool payforwardValid(const Block & block) const;
         const std::vector<std::unique_ptr<Block>> & frontier() const;
         const std::vector<std::unique_ptr<Block>> & frontier(signed int offset) const;
 
