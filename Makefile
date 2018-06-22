@@ -26,7 +26,7 @@ test: $(CATCH_TST).o $(OBJS) $(TST_SRCS)
 	$(CPP) $(CPPFLAGS) $(INC) $(LDLIBS) -o $@ $^ && ./$@
 
 run: $(OBJS) $(MAIN)
-	$(CPP) $(CPPFLAGS) $(INC) $(LDLIBS) -o $@ $^ && ./$@
+	$(CPP) $(CPPFLAGS) $(INC) $(LDLIBS) -o $@ $^
 
 clean:
 	rm -f $(OBJS) test run
