@@ -2,4 +2,6 @@ test
 run
 *.dSYM
 *.o
-results-*
+results*
+figures
+.DS_Store

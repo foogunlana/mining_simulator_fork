@@ -21,6 +21,7 @@
 #include <iostream>
 #include <fstream>
 #include <sys/stat.h>
+#include <string>
 
 #define LAMBERT_COEFF 0.13533528323661
 //coeff for lambert func equil  must be in [0,.2]
@@ -37,7 +38,7 @@ struct RunSettings {
     std::string folderPrefix;
 };
 
-std::string makeResultsFolder(RunSettings settings);
+std::string makeResultsFolder(std::string resultFolder);
 Value calculateMaxProfit(RunSettings settings);
 void run(RunSettings settings);
 void writeWeights(unsigned int gameNum, LM::Exp3 model, std::vector<std::ofstream> & outputStreams);
@@ -50,6 +51,7 @@ struct Args {
     unsigned int payforward;
     unsigned int minerCount;
     unsigned int defaultMinerCount;
+    std::string out;
     bool commentary;
 };
 struct Parser {
@@ -78,6 +80,8 @@ struct Parser {
                     ->default_value("200"))
                 ("d,default-miners", "number of miners using honest strategy", cxxopts::value<unsigned int>()
                     ->default_value("0"))
+                ("o,out", "folder name for results", cxxopts::value<std::string>()
+                    ->default_value("results"))
                 ("c,commentary", "turn on commentary on games")
             ;
 
@@ -93,6 +97,7 @@ struct Parser {
             args.payforward = result["p"].as<unsigned int>();
             args.minerCount = result["m"].as<unsigned int>();
             args.defaultMinerCount = result["d"].as<unsigned int>();
+            args.out = result["o"].as<std::string>();
             args.commentary = result.count("c") > 0;
 
         } catch (const cxxopts::OptionException& e) {
@@ -111,16 +116,11 @@ void writeWeights(unsigned int gameNum, LM::Exp3 model, std::vector<std::ofstrea
     }
 }
 
-std::string makeResultsFolder(RunSettings settings) {
-    std::string resultFolder = "";
-    if (settings.folderPrefix.length() > 0) {
-        resultFolder += settings.folderPrefix + "-";
-    }
-    resultFolder += std::to_string(rawCount(settings.fixedDefault));
+std::string makeResultsFolder(std::string resultsFolder) {
     char final [256];
-    sprintf (final, "./%s", resultFolder.c_str());
+    sprintf (final, "./%s", resultsFolder.c_str());
     mkdir(final,0775);
-    return resultFolder;
+    return resultsFolder;
 }
 
 Value calculateMaxProfit(RunSettings settings) {
@@ -142,7 +142,8 @@ void run(RunSettings settings) {
     auto petty = std::make_unique<MG::PettyBehaviour>();
     auto payforward = std::make_unique<MG::PayforwardBehaviour>();
     auto lazyFork = std::make_unique<MG::LazyForkBehaviour>();
-    auto resultFolder = makeResultsFolder(settings);
+
+    auto resultFolder = makeResultsFolder(settings.folderPrefix);
 
     auto defaultStrategy(std::make_unique<LM::Strategy>("default", defaultWeight, honest.get()));
 
@@ -226,6 +227,6 @@ int main(int argc, char * argv[]) {
 
     MG::GameSettings gameSettings = {blockchainSettings, args.commentary};
     // RunSettings runSettings = {1000, MinerCount(200), MinerCount(0), gameSettings, "test"};
-    RunSettings runSettings = {args.numGames, args.minerCount, args.defaultMinerCount, gameSettings, "results"};
+    RunSettings runSettings = {args.numGames, args.minerCount, args.defaultMinerCount, gameSettings, args.out};
     run(runSettings);
 }
