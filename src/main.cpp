@@ -193,10 +193,12 @@ void run(RunSettings settings) {
         // NOTE: implicit assumption that the first n miners are learners
         // where n is the number of learning miners! Do not change without
         // considering that.
+
         assert(results.minerResults.size() >= minerProfiles.size());
-        for (size_t i = 0; i < results.minerResults.size(); i++) {
+        for (size_t i = 0; i < minerProfiles.size(); i++) {
             minerProfiles[i].currentReward = results.minerResults[i].totalProfit;
         }
+
         minerProfiles = model.updateStrategyProfiles(minerProfiles, maxProfit);
         writeWeights(gameNum, model, outputStreams);
     }
