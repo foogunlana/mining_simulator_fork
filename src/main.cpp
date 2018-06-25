@@ -67,7 +67,7 @@ struct Parser {
                 .add_options("commands")
                 ("h,help", "Print help")
                 ("n,ngames", "number of games in epoch", cxxopts::value<unsigned int>()
-                    ->default_value("10000"))
+                    ->default_value("1000"))
                 ("x,tx", "expected tx fees gathered in one block", cxxopts::value<unsigned int>()
                     ->default_value("50"))
                 ("r,reward", "block reward", cxxopts::value<unsigned int>()
