@@ -84,7 +84,11 @@ namespace mining_game {
     }
 
     bool Blockchain::payforwardValid(const Block & block) const {
-        return block.params.payforward == payforward;
+        return (block.realValue() - (Profit) block.params.fixedReward) <= expectedTxFees();
+    }
+
+    Value Blockchain::expectedTxFees() const {
+        return secondsPerBlock * transactionFeeRate;
     }
 
     Value Blockchain::txPooled(BlockTime period) const {

@@ -39,6 +39,11 @@ namespace mining_game {
     }
 
     Value PayforwardBehaviour::payForward(const Blockchain & chain, const Miner & miner, const Block & parent, Value fees) const {
-        return parent.params.payforward;
+        Value expectedTxFees = chain.expectedTxFees();
+        if (fees > expectedTxFees) {
+            return fees - expectedTxFees;
+        } else {
+            return Value(0);
+        }
     }
 }

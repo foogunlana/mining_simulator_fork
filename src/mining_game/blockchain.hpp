@@ -49,6 +49,7 @@ namespace mining_game {
 
         BlockTime getTime() const { return timeInSecs; };
         BlockTime getMaxHeightPub() const { return _maxHeightPub; };
+        Value expectedTxFees() const;
 
         Value gap() const;
         Value rem(const Block & block) const;

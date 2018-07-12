@@ -153,8 +153,8 @@ void run(RunSettings settings) {
     learningStrategies.push_back(std::make_unique<LM::Strategy>("payforward", defaultWeight, payforward.get()));
     outputStreams.push_back(std::ofstream(resultFolder + "/payforward.txt"));
 
-    learningStrategies.push_back(std::make_unique<LM::Strategy>("lazy-fork", defaultWeight, lazyFork.get()));
-    outputStreams.push_back(std::ofstream(resultFolder + "/lazy-fork.txt"));
+    learningStrategies.push_back(std::make_unique<LM::Strategy>("petty", defaultWeight, petty.get()));
+    outputStreams.push_back(std::ofstream(resultFolder + "/petty.txt"));
 
     // learningStrategies.push_back(std::make_unique<LM::Strategy>("petty", defaultWeight, petty.get()));
     // outputStreams.push_back(std::ofstream(resultFolder + "/petty.txt"));
