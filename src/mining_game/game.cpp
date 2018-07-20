@@ -18,7 +18,8 @@
 
 namespace mining_game {
 
-    Game::Game(GameSettings settings_): blockchainSettings(settings_.blockchainSettings), commentaryOn(settings_.commentary) {}
+    Game::Game(GameSettings settings_, std::vector<std::string> & _strategyNames):
+        blockchainSettings(settings_.blockchainSettings), strategyNames(_strategyNames), commentaryOn(settings_.commentary) {}
 
     GameResult Game::run(MinerGroup &minerGroup, Blockchain &blockchain) {
 
@@ -58,11 +59,11 @@ namespace mining_game {
 
         // for commentary
         std::map<std::string, int> winningCount;
-        std::vector<std::string> strategyNames {
-            // "petty",
-            "payforward",
-            "lazyFork"
-        };
+        // std::vector<std::string> strategyNames {
+        //     // "petty",
+        //     "payforward",
+        //     "lazyFork"
+        // };
         for (auto &s: strategyNames) {
             winningCount[s] = 0;
         }

@@ -22,6 +22,7 @@
 #include <fstream>
 #include <sys/stat.h>
 #include <string>
+#include <map>
 
 #define LAMBERT_COEFF 0.13533528323661
 //coeff for lambert func equil  must be in [0,.2]
@@ -143,21 +144,27 @@ void run(RunSettings settings) {
     auto payforward = std::make_unique<MG::PayforwardBehaviour>();
     auto lazyFork = std::make_unique<MG::LazyForkBehaviour>();
 
-    auto resultFolder = makeResultsFolder(settings.folderPrefix);
+    std::map<std::string, LM::Behaviour *> behaviours {
+        {"honest", honest.get()},
+        {"petty", petty.get()},
+        {"payforward", payforward.get()},
+        {"lazy", lazyFork.get()},
+    };
+    std::vector<std::string> strategyNames {
+        "payforward",
+        "petty",
+        "lazy"
+    };
 
+    auto resultFolder = makeResultsFolder(settings.folderPrefix);
     auto defaultStrategy(std::make_unique<LM::Strategy>("default", defaultWeight, honest.get()));
 
-    // NOTE: better to use map here but requires getStrategies from model instead of only weights
+
     std::vector<std::ofstream> outputStreams;
-
-    learningStrategies.push_back(std::make_unique<LM::Strategy>("payforward", defaultWeight, payforward.get()));
-    outputStreams.push_back(std::ofstream(resultFolder + "/payforward.txt"));
-
-    learningStrategies.push_back(std::make_unique<LM::Strategy>("lazyFork", defaultWeight, lazyFork.get()));
-    outputStreams.push_back(std::ofstream(resultFolder + "/lazyFork.txt"));
-
-    // learningStrategies.push_back(std::make_unique<LM::Strategy>("petty", defaultWeight, petty.get()));
-    // outputStreams.push_back(std::ofstream(resultFolder + "/petty.txt"));
+    for (auto &name : strategyNames) {
+        learningStrategies.push_back(std::make_unique<LM::Strategy>(name, defaultWeight, behaviours[name]));
+        outputStreams.push_back(std::ofstream(resultFolder + "/" + name + ".txt"));
+    }
 
     std::vector<LM::Strategy *> expLearningStrategies;
     for(auto &s: learningStrategies) {
@@ -180,7 +187,7 @@ void run(RunSettings settings) {
     // NOTE: max profit is unpredictable in pay forward game since miners subsidise with external funds
     // NOTE: max profit calculated is in case of no pay forward
     auto maxProfit = calculateMaxProfit(settings);
-    MG::Game game(settings.gameSettings);
+    MG::Game game(settings.gameSettings, strategyNames);
 
     writeWeights(0, model, outputStreams);
 

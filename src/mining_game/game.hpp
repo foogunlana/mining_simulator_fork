@@ -23,9 +23,10 @@ namespace mining_game {
     class Game {
     private:
         BlockchainSettings blockchainSettings;
+        std::vector<std::string> & strategyNames;
         bool commentaryOn;
     public:
-        Game(GameSettings settings);
+        Game(GameSettings settings, std::vector<std::string> & strategyNames);
         GameResult run(MinerGroup &minerGroup, Blockchain &blockchain);
     };
 }
