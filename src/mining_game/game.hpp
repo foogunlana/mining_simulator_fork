@@ -16,6 +16,7 @@ namespace mining_game {
     struct GameSettings {
         BlockchainSettings blockchainSettings;
         bool commentary;
+        std::vector<std::string> strategies;
     };
 
     class MinerGroup;
@@ -23,10 +24,10 @@ namespace mining_game {
     class Game {
     private:
         BlockchainSettings blockchainSettings;
-        std::vector<std::string> & strategyNames;
+        std::vector<std::string> strategyNames;
         bool commentaryOn;
     public:
-        Game(GameSettings settings, std::vector<std::string> & strategyNames);
+        Game(GameSettings settings);
         GameResult run(MinerGroup &minerGroup, Blockchain &blockchain);
     };
 }

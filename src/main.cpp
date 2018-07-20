@@ -23,6 +23,7 @@
 #include <sys/stat.h>
 #include <string>
 #include <map>
+#include <sstream>
 
 #define LAMBERT_COEFF 0.13533528323661
 //coeff for lambert func equil  must be in [0,.2]
@@ -52,6 +53,7 @@ struct Args {
     unsigned int payforward;
     unsigned int minerCount;
     unsigned int defaultMinerCount;
+    std::vector<std::string> strategies;
     std::string out;
     bool commentary;
 };
@@ -81,6 +83,8 @@ struct Parser {
                     ->default_value("200"))
                 ("d,default-miners", "number of miners using honest strategy", cxxopts::value<unsigned int>()
                     ->default_value("0"))
+                ("s,strategies", "comma [no-space] separated chosen strategies. Defaults to petty,payforward,lazy", cxxopts::value<std::string>()
+                    ->default_value("petty,payforward,lazy"))
                 ("o,out", "folder name for results", cxxopts::value<std::string>()
                     ->default_value("results"))
                 ("c,commentary", "turn on commentary on games")
@@ -100,6 +104,14 @@ struct Parser {
             args.defaultMinerCount = result["d"].as<unsigned int>();
             args.out = result["o"].as<std::string>();
             args.commentary = result.count("c") > 0;
+
+            std::stringstream ss(result["strategies"].as<std::string>());
+            while(ss.good())
+            {
+                std::string strategy;
+                getline(ss, strategy, ',');
+                args.strategies.push_back(strategy);
+            }
 
         } catch (const cxxopts::OptionException& e) {
             std::cout << "error parsing options: " << e.what() << std::endl;
@@ -144,26 +156,20 @@ void run(RunSettings settings) {
     auto payforward = std::make_unique<MG::PayforwardBehaviour>();
     auto lazyFork = std::make_unique<MG::LazyForkBehaviour>();
 
-    std::map<std::string, LM::Behaviour *> behaviours {
+    std::map<std::string, LM::Behaviour *> strategies {
         {"honest", honest.get()},
         {"petty", petty.get()},
         {"payforward", payforward.get()},
         {"lazy", lazyFork.get()},
     };
-    std::vector<std::string> strategyNames {
-        "payforward",
-        "petty",
-        "lazy"
-    };
 
     auto resultFolder = makeResultsFolder(settings.folderPrefix);
-    auto defaultStrategy(std::make_unique<LM::Strategy>("default", defaultWeight, honest.get()));
-
+    auto defaultStrategy(std::make_unique<LM::Strategy>("honest", defaultWeight, honest.get()));
 
     std::vector<std::ofstream> outputStreams;
-    for (auto &name : strategyNames) {
-        learningStrategies.push_back(std::make_unique<LM::Strategy>(name, defaultWeight, behaviours[name]));
-        outputStreams.push_back(std::ofstream(resultFolder + "/" + name + ".txt"));
+    for (auto &strategy : settings.gameSettings.strategies) {
+        learningStrategies.push_back(std::make_unique<LM::Strategy>(strategy, defaultWeight, strategies[strategy]));
+        outputStreams.push_back(std::ofstream(resultFolder + "/" + strategy + ".txt"));
     }
 
     std::vector<LM::Strategy *> expLearningStrategies;
@@ -187,7 +193,7 @@ void run(RunSettings settings) {
     // NOTE: max profit is unpredictable in pay forward game since miners subsidise with external funds
     // NOTE: max profit calculated is in case of no pay forward
     auto maxProfit = calculateMaxProfit(settings);
-    MG::Game game(settings.gameSettings, strategyNames);
+    MG::Game game(settings.gameSettings);
 
     writeWeights(0, model, outputStreams);
 
@@ -232,7 +238,7 @@ int main(int argc, char * argv[]) {
         payforward
     };
 
-    MG::GameSettings gameSettings = {blockchainSettings, args.commentary};
+    MG::GameSettings gameSettings = {blockchainSettings, args.commentary, args.strategies};
     // RunSettings runSettings = {1000, MinerCount(200), MinerCount(0), gameSettings, "test"};
     RunSettings runSettings = {args.numGames, args.minerCount, args.defaultMinerCount, gameSettings, args.out};
     run(runSettings);
