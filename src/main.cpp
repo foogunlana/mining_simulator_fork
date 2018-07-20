@@ -44,6 +44,19 @@ std::string makeResultsFolder(std::string resultFolder);
 Value calculateMaxProfit(RunSettings settings);
 void run(RunSettings settings);
 void writeWeights(unsigned int gameNum, LM::Exp3 model, std::vector<std::ofstream> & outputStreams);
+std::vector<std::string> split(std::string text, char delimiter);
+
+std::vector<std::string> split(std::string text, char delimiter) {
+    std::vector<std::string> chunks;
+    std::stringstream ss(text);
+    while(ss.good())
+    {
+        std::string chunk;
+        getline(ss, chunk, delimiter);
+        chunks.push_back(chunk);
+    }
+    return chunks;
+}
 
 // ********** PARSER *************** //
 struct Args {
@@ -83,8 +96,8 @@ struct Parser {
                     ->default_value("200"))
                 ("d,default-miners", "number of miners using honest strategy", cxxopts::value<unsigned int>()
                     ->default_value("0"))
-                ("s,strategies", "comma [no-space] separated chosen strategies. Defaults to petty,payforward,lazy", cxxopts::value<std::string>()
-                    ->default_value("petty,payforward,lazy"))
+                ("s,strategies", "comma [no-space] separated chosen strategies & relative weights. Defaults to petty:1,payforward:1,lazy:1", cxxopts::value<std::string>()
+                    ->default_value("petty:1,payforward:1,lazy:1"))
                 ("o,out", "folder name for results", cxxopts::value<std::string>()
                     ->default_value("results"))
                 ("c,commentary", "turn on commentary on games")
@@ -104,14 +117,7 @@ struct Parser {
             args.defaultMinerCount = result["d"].as<unsigned int>();
             args.out = result["o"].as<std::string>();
             args.commentary = result.count("c") > 0;
-
-            std::stringstream ss(result["strategies"].as<std::string>());
-            while(ss.good())
-            {
-                std::string strategy;
-                getline(ss, strategy, ',');
-                args.strategies.push_back(strategy);
-            }
+            args.strategies = split(result["strategies"].as<std::string>(), ',');
 
         } catch (const cxxopts::OptionException& e) {
             std::cout << "error parsing options: " << e.what() << std::endl;
@@ -168,7 +174,11 @@ void run(RunSettings settings) {
 
     std::vector<std::ofstream> outputStreams;
     for (auto &strategy : settings.gameSettings.strategies) {
-        learningStrategies.push_back(std::make_unique<LM::Strategy>(strategy, defaultWeight, strategies[strategy]));
+        std::vector<std::string> s = split(strategy, ':');
+        assert(s.size() == 2);
+        std::string name = s[0];
+        int weight = stoi(s[1]);
+        learningStrategies.push_back(std::make_unique<LM::Strategy>(strategy, weight * defaultWeight, strategies[name]));
         outputStreams.push_back(std::ofstream(resultFolder + "/" + strategy + ".txt"));
     }
 
