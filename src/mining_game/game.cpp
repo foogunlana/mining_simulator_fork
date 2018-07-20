@@ -14,10 +14,12 @@
 
 
 #include <iostream>
+#include <map>
 
 namespace mining_game {
 
-    Game::Game(GameSettings settings_): blockchainSettings(settings_.blockchainSettings), commentaryOn(settings_.commentary) {}
+    Game::Game(GameSettings settings_):
+        blockchainSettings(settings_.blockchainSettings), strategyNames(settings_.strategies), commentaryOn(settings_.commentary) {}
 
     GameResult Game::run(MinerGroup &minerGroup, Blockchain &blockchain) {
 
@@ -51,11 +53,16 @@ namespace mining_game {
         auto winningChain = winningBlock.getChain();
 
         int parentCount = 0;
-        int payforwardCount = 0;
-        int pettyCount = 0;
         Profit totalValue(0);
         std::vector<std::string> winners;
         winners.resize(winningBlock.height+1);
+
+        // for commentary
+        std::map<std::string, int> winningCount;
+        for (auto & s: strategyNames) {
+            winningCount[s] = 0;
+        }
+        //
 
         for (auto mined : winningChain) {
             if (mined->height == BlockHeight(0)) {
@@ -68,31 +75,24 @@ namespace mining_game {
             auto &miner = *(mined->miner);
             minerResults[miner.params.number].addBlock(mined);
             totalValue += mined->realValue();
-
-            if (miner.getStrategyName() == "payforward") {
-                payforwardCount++;
-            } else if (miner.getStrategyName() == "petty") {
-                pettyCount++;
-            }
+            winningCount[miner.getStrategyName()]++;
         }
 
-        for (size_t h = 1; h < blockchain.getMaxHeightPub(); h++) {
-            int payforwardBlockCount = 0;
-            int pettyBlockCount = 0;
-            const std::vector<std::unique_ptr<Block>> & blocks = blockchain.frontier(h);
-            for (const std::unique_ptr<Block> &block : blocks) {
-                if (block->miner->getStrategyName() == "payforward") {
-                    payforwardBlockCount++;
-                } else if (block->miner->getStrategyName() == "petty") {
-                    pettyBlockCount++;
+        if (commentaryOn) {
+            for (size_t h = 1; h < blockchain.getMaxHeightPub(); h++) {
+                const std::vector<std::unique_ptr<Block>> & blocks = blockchain.frontier(h);
+                for (const std::unique_ptr<Block> &block : blocks) {
+                    std::cout << *block << std::endl;
                 }
-                if (commentaryOn) std::cout << *block << std::endl;
+                std::cout << "Winner=" << winners[h] << std::endl;
             }
-            if (commentaryOn) std::cout << "winner=" << winners[h] << std::endl;
+            std::cout << "Blocks in winning chain: " << std::endl;
+            for (auto &s : strategyNames) {
+                std::cout << " - " << s << ": " << winningCount[s] << std::endl;
+            }
+            std::cout << "Value in winning chain=" << winningBlock.valueInChain << std::endl;
+            std::cout << "Expected value=" << endTime * blockchainSettings.transactionFeeRate << std::endl;
         }
-        if (commentaryOn) std::cout << "Blocks in winning chain: petty=" << pettyCount << " & payforward=" << payforwardCount << std::endl <<
-        "value in winning chain=" << winningBlock.valueInChain << std::endl <<
-        "expected value=" << endTime * blockchainSettings.transactionFeeRate << std::endl;
 
        // std::cout << parentCount << " block mined over parent" << std::endl;
         //calculate the score at the end
