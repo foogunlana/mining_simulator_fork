@@ -177,7 +177,7 @@ void run(RunSettings settings) {
         std::vector<std::string> s = split(strategy, ':');
         assert(s.size() == 2);
         std::string name = s[0];
-        int weight = stoi(s[1]);
+        double weight = stod(s[1]);
         learningStrategies.push_back(std::make_unique<LM::Strategy>(strategy, weight * defaultWeight, strategies[name]));
         outputStreams.push_back(std::ofstream(resultFolder + "/" + strategy + ".txt"));
     }
