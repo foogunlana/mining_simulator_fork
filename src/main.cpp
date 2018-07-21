@@ -14,6 +14,7 @@
 #include "src/mining_game/petty_behaviour.hpp"
 #include "src/mining_game/lazy_fork_behaviour.hpp"
 #include "src/mining_game/payforward_behaviour.hpp"
+#include "src/mining_game/function_fork_behaviour.hpp"
 
 #include "lib/cxxopts/cxxopts.hpp"
 
@@ -161,6 +162,7 @@ void run(RunSettings settings) {
     auto petty = std::make_unique<MG::PettyBehaviour>();
     auto payforward = std::make_unique<MG::PayforwardBehaviour>();
     auto lazyFork = std::make_unique<MG::LazyForkBehaviour>();
+    std::vector<std::unique_ptr<LM::Behaviour>> funcForks;
 
     std::map<std::string, LM::Behaviour *> strategies {
         {"honest", honest.get()},
@@ -179,6 +181,11 @@ void run(RunSettings settings) {
         assert(s.size() == 2);
         std::string name = s[0];
         double weight = stod(s[1]);
+        if (name.substr(0, 4) == "fork") {
+            int coeff = stoi(split(name, '-')[1]);
+            funcForks.push_back(std::make_unique<MG::FunctionForkBehaviour>(coeff));
+            strategies[name] = funcForks.back().get();
+        }
         learningStrategies.push_back(std::make_unique<LM::Strategy>(strategy, weight * defaultWeight, strategies[name]));
         outputStreams.push_back(std::ofstream(resultFolder + "/" + strategy + ".txt"));
     }

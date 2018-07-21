@@ -1,12 +1,12 @@
 
-#ifndef lazy_fork_behaviour_hpp
-#define lazy_fork_behaviour_hpp
+#ifndef function_fork_behaviour_hpp
+#define function_fork_behaviour_hpp
 
 #include "src/utils/typeDefs.hpp"
 #include "src/learning_model/behaviour.hpp"
 
 #include <string>
-
+#include <functional>
 
 namespace mining_game {
 
@@ -14,16 +14,21 @@ namespace mining_game {
     class Block;
     class Miner;
 
-    class LazyForkBehaviour : public learning_model::Behaviour {
+    class FunctionForkBehaviour : public learning_model::Behaviour {
+    private:
+        int coefficient;
     public:
-        LazyForkBehaviour();
+        FunctionForkBehaviour(int coefficient);
 
         Block & chooseParent(const Blockchain & chain, const Miner & miner) const override;
         // Block & publish(const Blockchain & chain, const & miner) const;
         Value collectFees(const Blockchain & chain, const Miner & miner, const Block & block, Value txFeesAvailable) const override;
         Value payForward(const Blockchain & chain, const Miner & miner, const Block & block, Value fees) const override;
 
+        Value f(Value txFees) const;
         bool shouldUndercut(const Blockchain & chain) const;
+        bool valUnder(const Blockchain & chain) const;
+        bool valCont(const Blockchain & chain) const;
     };
 }
 

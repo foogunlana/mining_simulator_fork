@@ -15,8 +15,6 @@
 
 namespace mining_game {
 
-    bool shouldUndercut(const Blockchain & chain);
-
     LazyForkBehaviour::LazyForkBehaviour() : learning_model::Behaviour() {}
 
     Block & LazyForkBehaviour::chooseParent(const Blockchain & chain, const Miner & miner) const {
@@ -39,7 +37,7 @@ namespace mining_game {
         return Value(0);
     }
 
-    bool shouldUndercut(const Blockchain & chain) {
+    bool LazyForkBehaviour::shouldUndercut(const Blockchain & chain) const {
         return chain.gap() >= chain.mostRem(chain.frontier());
     }
 

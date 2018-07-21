@@ -20,6 +20,10 @@ namespace mining_game {
     PayforwardBehaviour::PayforwardBehaviour() : learning_model::Behaviour() {}
 
     Block & PayforwardBehaviour::chooseParent(const Blockchain & chain, const Miner & miner) const {
+        if(chain.maxPayforwardValidHeight == 0) {
+            const std::vector<std::unique_ptr<Block>> & validFrontier = chain.frontier();
+            return *validFrontier[0].get();
+        }
         const std::vector<std::unique_ptr<Block>> & validFrontier = chain.frontier(chain.maxPayforwardValidHeight);
         std::vector<Block *> possiblities;
         for (auto &block : validFrontier) {
