@@ -30,6 +30,7 @@ namespace mining_game {
         bool valCont(const Blockchain & chain) const;
         
         static std::function<Value(Value)> forkWithCoefficient(int coefficient);
+        static std::function<Value(Value)> lambertWithCoefficient(int coefficient);
     };
 }
 

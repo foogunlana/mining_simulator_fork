@@ -26,10 +26,6 @@
 #include <map>
 #include <sstream>
 
-#define LAMBERT_COEFF 0.13533528323661
-//coeff for lambert func equil  must be in [0,.2]
-//0.13533528323661 = 1/(e^2)
-
 namespace LM = learning_model;
 namespace MG = mining_game;
 
@@ -176,14 +172,27 @@ void run(RunSettings settings) {
 
     std::vector<std::ofstream> outputStreams;
     double defaultWeightScale(1);
+    double defaultLambertCoefficient(0.13533528323661);
+    //coeff for lambert func equil  must be in [0,.2]
+    //0.13533528323661 = 1/(e^2)
+    
     for (auto &strategy : settings.gameSettings.strategies) {
         std::vector<std::string> s = split(strategy, ':');
         std::string name = s[0];
         double weightScaling = s.size() == 2 ? stod(s[1]) : defaultWeightScale;
         if (name.substr(0, 4) == "fork") {
-            int coeff = stoi(split(name, '-')[1]);
+            std::vector<std::string> f = split(name, '-');
+            assert(f.size() == 2);
+            int coeff = stoi(f[1]);
             funcForks.push_back(std::make_unique<MG::FunctionForkBehaviour>(
                 MG::FunctionForkBehaviour::forkWithCoefficient(coeff)
+            ));
+            strategies[name] = funcForks.back().get();
+        } else if (name.substr(0, 7) == "lambert") {
+            std::vector<std::string> l = split(name, '-');
+            double coeff = l.size() == 2 ? stod(l[1]) : defaultLambertCoefficient;
+            funcForks.push_back(std::make_unique<MG::FunctionForkBehaviour>(
+                MG::FunctionForkBehaviour::lambertWithCoefficient(coeff)
             ));
             strategies[name] = funcForks.back().get();
         }

@@ -60,4 +60,10 @@ namespace mining_game {
             return txFees / Value(coeff);
         };
     }
+
+    std::function<Value(Value)> FunctionForkBehaviour::lambertWithCoefficient(int coeff) {
+        return [coeff] (Value txFees) -> Value {
+            return txFees;
+        };
+    }
 }
