@@ -17,7 +17,7 @@ namespace mining_game {
 
     bool shouldUndercut(const Blockchain & chain);
 
-    FunctionForkBehaviour::FunctionForkBehaviour(int _coefficient) : learning_model::Behaviour(), coefficient(_coefficient) {}
+    FunctionForkBehaviour::FunctionForkBehaviour(std::function<Value(Value)> _f) : learning_model::Behaviour(), f(_f) {}
 
     Block & FunctionForkBehaviour::chooseParent(const Blockchain & chain, const Miner & miner) const {
         if (shouldUndercut(chain) && (chain.getMaxHeightPub() != 0)) {
@@ -55,7 +55,9 @@ namespace mining_game {
         return f(chain.mostRem(chain.frontier()));
     }
 
-    Value FunctionForkBehaviour::f(Value txFees) const {
-        return txFees / Value(coefficient);
+    std::function<Value(Value)> FunctionForkBehaviour::forkWithCoefficient(int coeff) {
+        return [coeff] (Value txFees) -> Value {
+            return txFees / Value(coeff);
+        };
     }
 }

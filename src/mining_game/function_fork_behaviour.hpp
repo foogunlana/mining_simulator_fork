@@ -16,19 +16,20 @@ namespace mining_game {
 
     class FunctionForkBehaviour : public learning_model::Behaviour {
     private:
-        int coefficient;
+        std::function<Value(Value)> f;
     public:
-        FunctionForkBehaviour(int coefficient);
+        FunctionForkBehaviour(std::function<Value(Value)> f);
 
         Block & chooseParent(const Blockchain & chain, const Miner & miner) const override;
         // Block & publish(const Blockchain & chain, const & miner) const;
         Value collectFees(const Blockchain & chain, const Miner & miner, const Block & block, Value txFeesAvailable) const override;
         Value payForward(const Blockchain & chain, const Miner & miner, const Block & block, Value fees) const override;
 
-        Value f(Value txFees) const;
         bool shouldUndercut(const Blockchain & chain) const;
         bool valUnder(const Blockchain & chain) const;
         bool valCont(const Blockchain & chain) const;
+        
+        static std::function<Value(Value)> forkWithCoefficient(int coefficient);
     };
 }
 

@@ -183,7 +183,9 @@ void run(RunSettings settings) {
         double weight = stod(s[1]);
         if (name.substr(0, 4) == "fork") {
             int coeff = stoi(split(name, '-')[1]);
-            funcForks.push_back(std::make_unique<MG::FunctionForkBehaviour>(coeff));
+            funcForks.push_back(std::make_unique<MG::FunctionForkBehaviour>(
+                MG::FunctionForkBehaviour::forkWithCoefficient(coeff)
+            ));
             strategies[name] = funcForks.back().get();
         }
         learningStrategies.push_back(std::make_unique<LM::Strategy>(strategy, weight * defaultWeight, strategies[name]));
