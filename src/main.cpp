@@ -93,7 +93,7 @@ struct Parser {
                     ->default_value("200"))
                 ("d,default-miners", "number of miners stubbornly using honest strategy", cxxopts::value<unsigned int>()
                     ->default_value("0"))
-                ("s,strategies", "comma [no-space] separated chosen strategies & relative weights. Defaults to petty:1,payforward:1,lazy:1", cxxopts::value<std::string>()
+                ("s,strategies", "comma [no-space] separated chosen strategies & relative weights", cxxopts::value<std::string>()
                     ->default_value("petty:1,payforward:1,lazy:1"))
                 ("o,out", "folder name for results", cxxopts::value<std::string>()
                     ->default_value("results"))
