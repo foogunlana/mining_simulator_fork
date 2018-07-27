@@ -175,6 +175,8 @@ void run(RunSettings settings) {
     double defaultLambertCoefficient(0.13533528323661);
     //coeff for lambert func equil  must be in [0,.2]
     //0.13533528323661 = 1/(e^2)
+    Value expectedTxFees(
+        settings.gameSettings.blockchainSettings.secondsPerBlock * settings.gameSettings.blockchainSettings.transactionFeeRate);
     
     for (auto &strategy : settings.gameSettings.strategies) {
         std::vector<std::string> s = split(strategy, ':');
@@ -192,7 +194,7 @@ void run(RunSettings settings) {
             std::vector<std::string> l = split(name, '-');
             double coeff = l.size() == 2 ? stod(l[1]) : defaultLambertCoefficient;
             funcForks.push_back(std::make_unique<MG::FunctionForkBehaviour>(
-                MG::FunctionForkBehaviour::lambertWithCoefficient(coeff)
+                MG::FunctionForkBehaviour::lambertWithCoefficient(coeff, expectedTxFees)
             ));
             strategies[name] = funcForks.back().get();
         }

@@ -26,11 +26,11 @@ namespace mining_game {
         Value payForward(const Blockchain & chain, const Miner & miner, const Block & block, Value fees) const override;
 
         bool shouldUndercut(const Blockchain & chain) const;
-        bool valUnder(const Blockchain & chain) const;
-        bool valCont(const Blockchain & chain) const;
+        Value valUnder(const Blockchain & chain) const;
+        Value valCont(const Blockchain & chain) const;
         
         static std::function<Value(Value)> forkWithCoefficient(int coefficient);
-        static std::function<Value(Value)> lambertWithCoefficient(int coefficient);
+        static std::function<Value(Value)> lambertWithCoefficient(double coefficient, Value expectedTxFees);
     };
 }
 

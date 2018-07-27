@@ -11,7 +11,10 @@
 
 #include <vector>
 #include <iostream>
+#include <gsl/gsl_sf_lambert.h>
+#include <cmath>
 
+#define UNDERCUT_VALUE Value(100000)
 
 namespace mining_game {
 
@@ -44,14 +47,14 @@ namespace mining_game {
     }
 
     bool FunctionForkBehaviour::shouldUndercut(const Blockchain & chain) const {
-        return (valUnder(chain) >= valCont(chain));
+        return valUnder(chain) > valCont(chain);
     }
 
-    bool FunctionForkBehaviour::valUnder(const Blockchain & chain) const {
+    Value FunctionForkBehaviour::valUnder(const Blockchain & chain) const {
         return std::min(chain.gap(), f(chain.mostRem(chain.frontier(-1))));
     }
 
-    bool FunctionForkBehaviour::valCont(const Blockchain & chain) const {
+    Value FunctionForkBehaviour::valCont(const Blockchain & chain) const {
         return f(chain.mostRem(chain.frontier()));
     }
 
@@ -61,9 +64,22 @@ namespace mining_game {
         };
     }
 
-    std::function<Value(Value)> FunctionForkBehaviour::lambertWithCoefficient(int coeff) {
-        return [coeff] (Value txFees) -> Value {
-            return txFees;
+    std::function<Value(Value)> FunctionForkBehaviour::lambertWithCoefficient(double lambertCoeff, Value expectedTxFees) {
+        return [lambertCoeff, expectedTxFees] (Value txFeesAvailable) -> Value {
+            double expectedSizeRaw = rawValue(expectedTxFees);
+            auto blockRatio = valuePercentage(txFeesAvailable, Value(expectedTxFees));
+            if (blockRatio <= lambertCoeff) {
+                return txFeesAvailable;
+            } else if (blockRatio < 2*lambertCoeff - std::log(lambertCoeff) - 1) {
+
+                double argToLambertFunct0 = -lambertCoeff*std::exp(blockRatio-2*lambertCoeff);
+                double lambertRes = gsl_sf_lambert_W0(argToLambertFunct0);
+
+                double newValue = -expectedSizeRaw * lambertRes;
+                return Value(static_cast<ValueType>(newValue));
+            } else {
+                return Value(expectedTxFees);
+            }
         };
     }
 }

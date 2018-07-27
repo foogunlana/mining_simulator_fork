@@ -38,7 +38,7 @@ namespace mining_game {
     }
 
     bool LazyForkBehaviour::shouldUndercut(const Blockchain & chain) const {
-        return chain.gap() >= chain.mostRem(chain.frontier());
+        return chain.gap() > chain.mostRem(chain.frontier());
     }
 
 }
