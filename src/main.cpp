@@ -175,12 +175,11 @@ void run(RunSettings settings) {
     auto defaultStrategy(std::make_unique<LM::Strategy>("honest", defaultWeight, honest.get()));
 
     std::vector<std::ofstream> outputStreams;
-
+    double defaultWeightScale(1);
     for (auto &strategy : settings.gameSettings.strategies) {
         std::vector<std::string> s = split(strategy, ':');
-        assert(s.size() == 2);
         std::string name = s[0];
-        double weight = stod(s[1]);
+        double weightScaling = s.size() == 2 ? stod(s[1]) : defaultWeightScale;
         if (name.substr(0, 4) == "fork") {
             int coeff = stoi(split(name, '-')[1]);
             funcForks.push_back(std::make_unique<MG::FunctionForkBehaviour>(
@@ -188,7 +187,7 @@ void run(RunSettings settings) {
             ));
             strategies[name] = funcForks.back().get();
         }
-        learningStrategies.push_back(std::make_unique<LM::Strategy>(strategy, weight * defaultWeight, strategies[name]));
+        learningStrategies.push_back(std::make_unique<LM::Strategy>(strategy, weightScaling * defaultWeight, strategies[name]));
         outputStreams.push_back(std::ofstream(resultFolder + "/" + strategy + ".txt"));
     }
 
