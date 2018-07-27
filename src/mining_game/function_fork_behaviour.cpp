@@ -36,7 +36,7 @@ namespace mining_game {
 
     Value FunctionForkBehaviour::collectFees(const Blockchain & chain, const Miner & miner, const Block & parent, Value txFeesAvailable) const {
         if (shouldUndercut(chain) && (chain.getMaxHeightPub() != 0)) {
-            return std::min(chain.gap(), f(txFeesAvailable));
+            return std::min(chain.gap() - UNDERCUT_VALUE, f(txFeesAvailable));
         } else {
             return f(txFeesAvailable);
         }
@@ -51,7 +51,7 @@ namespace mining_game {
     }
 
     Value FunctionForkBehaviour::valUnder(const Blockchain & chain) const {
-        return std::min(chain.gap(), f(chain.mostRem(chain.frontier(-1))));
+        return std::min(chain.gap() - UNDERCUT_VALUE, f(chain.mostRem(chain.frontier(-1))));
     }
 
     Value FunctionForkBehaviour::valCont(const Blockchain & chain) const {
