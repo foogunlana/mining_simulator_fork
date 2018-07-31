@@ -188,7 +188,6 @@ int main(int argc, char * argv[]) {
     };
 
     MG::GameSettings gameSettings = {blockchainSettings, args.commentary, args.strategies};
-    // RunSettings runSettings = {1000, MinerCount(200), MinerCount(0), gameSettings, "test"};
     RunSettings runSettings = {args.numGames, args.minerCount, args.defaultMinerCount, gameSettings, args.out};
     run(runSettings);
 }

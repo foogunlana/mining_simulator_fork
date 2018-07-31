@@ -5,7 +5,6 @@
 #include "utils.hpp"
 
 #include <iostream>
-#include <assert>
 
 namespace utils {
     Parser::Parser() {}
@@ -38,13 +37,13 @@ namespace utils {
                 ->default_value("petty:1,payforward:1,lazy:1"))
             ("o,out", "folder name for results", cxxopts::value<std::string>()
                 ->default_value("results"))
-            ("c,commentary", "turn on commentary on games")
             ("satoshi-per-bitcoin", "# satoshi in 1 BTC", cxxopts::value<unsigned int>()
                 ->default_value("100000000"))
             ("blocks-per-epoch", "expected # blocks in 1 game", cxxopts::value<unsigned int>()
                 ->default_value("10000"))
             ("block-time", "expected # of seconds taken to find 1 block", cxxopts::value<unsigned int>()
                 ->default_value("600"))
+            ("c,commentary", "turn on commentary on games")
             ;
             
             auto result = options.parse(argc, argv);
