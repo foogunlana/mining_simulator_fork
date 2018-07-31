@@ -9,6 +9,7 @@
 #include "utils.hpp"
 
 #include <random>
+#include <sstream>
 
 namespace utils {
     inline std::mt19937& getGen() {
@@ -41,5 +42,17 @@ namespace utils {
 
         std::uniform_int_distribution<ValueType> dis(((rawValue(maxVal) - rawValue(minVal)) * 3) / 4 + rawValue(minVal), rawValue(maxVal));
         return Value(dis(gen));   //random between 75% maxVal and minVal
+    }
+
+    std::vector<std::string> split(std::string text, char delimiter) {
+        std::vector<std::string> chunks;
+        std::stringstream ss(text);
+        while(ss.good())
+        {
+            std::string chunk;
+            getline(ss, chunk, delimiter);
+            chunks.push_back(chunk);
+        }
+        return chunks;
     }
 }

@@ -12,6 +12,8 @@
 #include "typeDefs.hpp"
 
 #include <cstddef>
+#include <vector>
+#include <string>
 
 namespace utils {
 
@@ -20,6 +22,7 @@ namespace utils {
     BlockTime selectMiningOffset(TimeRate mean);
 
     Value valWithNoise(Value minVal, Value maxVal);
+    std::vector<std::string> split(std::string text, char delimiter);
 }
 
 #endif /* utils_hpp */

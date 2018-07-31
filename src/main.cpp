@@ -15,8 +15,8 @@
 #include "src/strategy_behaviour/lazy_fork_behaviour.hpp"
 #include "src/strategy_behaviour/payforward_behaviour.hpp"
 #include "src/strategy_behaviour/function_fork_behaviour.hpp"
-
-#include "lib/cxxopts/cxxopts.hpp"
+#include "src/utils/utils.hpp"
+#include "src/utils/parser.hpp"
 
 #include <vector>
 #include <iostream>
@@ -42,89 +42,7 @@ std::string makeResultsFolder(std::string resultFolder);
 Value calculateMaxProfit(RunSettings settings);
 void run(RunSettings settings);
 void writeWeights(unsigned int gameNum, LM::Exp3 model, std::vector<std::ofstream> & outputStreams);
-std::vector<std::string> split(std::string text, char delimiter);
 
-std::vector<std::string> split(std::string text, char delimiter) {
-    std::vector<std::string> chunks;
-    std::stringstream ss(text);
-    while(ss.good())
-    {
-        std::string chunk;
-        getline(ss, chunk, delimiter);
-        chunks.push_back(chunk);
-    }
-    return chunks;
-}
-
-// ********** PARSER *************** //
-struct Args {
-    unsigned int numGames;
-    unsigned int txFees1Block;
-    unsigned int blockReward;
-    unsigned int payforward;
-    unsigned int minerCount;
-    unsigned int defaultMinerCount;
-    std::vector<std::string> strategies;
-    std::string out;
-    bool commentary;
-};
-struct Parser {
-    Parser() {};
-    Args parse (int argc, char * argv[]) {
-        Args args;
-
-        try {
-            cxxopts::Options options(argv[0], " - command line options");
-            options
-                .positional_help("[-n --ngames], [-c --commentary]")
-                .show_positional_help();
-
-            options
-                .add_options("commands")
-                ("h,help", "Print help")
-                ("n,ngames", "number of games in epoch", cxxopts::value<unsigned int>()
-                    ->default_value("1000"))
-                ("x,tx", "expected tx fees gathered in one block", cxxopts::value<unsigned int>()
-                    ->default_value("50"))
-                ("r,reward", "block reward", cxxopts::value<unsigned int>()
-                    ->default_value("0"))
-                ("p,payforward", "initial pay forward to first block", cxxopts::value<unsigned int>()
-                    ->default_value("0"))
-                ("m,miners", "number of miners", cxxopts::value<unsigned int>()
-                    ->default_value("200"))
-                ("d,default-miners", "number of miners stubbornly using honest strategy", cxxopts::value<unsigned int>()
-                    ->default_value("0"))
-                ("s,strategies", "comma [no-space] separated chosen strategies & relative weights", cxxopts::value<std::string>()
-                    ->default_value("petty:1,payforward:1,lazy:1"))
-                ("o,out", "folder name for results", cxxopts::value<std::string>()
-                    ->default_value("results"))
-                ("c,commentary", "turn on commentary on games")
-            ;
-
-            auto result = options.parse(argc, argv);
-            if (result.count("help")) {
-                std::cout << options.help({"", "commands"}) << std::endl;
-                exit(0);
-            }
-
-            args.numGames = result["n"].as<unsigned int>();
-            args.txFees1Block = result["x"].as<unsigned int>();
-            args.blockReward = result["r"].as<unsigned int>();
-            args.payforward = result["p"].as<unsigned int>();
-            args.minerCount = result["m"].as<unsigned int>();
-            args.defaultMinerCount = result["d"].as<unsigned int>();
-            args.out = result["o"].as<std::string>();
-            args.commentary = result.count("c") > 0;
-            args.strategies = split(result["strategies"].as<std::string>(), ',');
-
-        } catch (const cxxopts::OptionException& e) {
-            std::cout << "error parsing options: " << e.what() << std::endl;
-            exit(1);
-        }
-        return args;
-    }
-};
- // ******** PARSER *********** //
 
 void writeWeights(unsigned int gameNum, LM::Exp3 model, std::vector<std::ofstream> & outputStreams) {
     auto strategyWeights = model.getStrategyWeights();
@@ -180,11 +98,11 @@ void run(RunSettings settings) {
         settings.gameSettings.blockchainSettings.secondsPerBlock * settings.gameSettings.blockchainSettings.transactionFeeRate);
     
     for (auto &strategy : settings.gameSettings.strategies) {
-        std::vector<std::string> s = split(strategy, ':');
+        std::vector<std::string> s = utils::split(strategy, ':');
         std::string name = s[0];
         double weightScaling = s.size() == 2 ? stod(s[1]) : defaultWeightScale;
         if (name.substr(0, 4) == "fork") {
-            std::vector<std::string> f = split(name, '-');
+            std::vector<std::string> f = utils::split(name, '-');
             assert(f.size() == 2);
             int coeff = stoi(f[1]);
             funcForks.push_back(std::make_unique<SB::FunctionForkBehaviour>(
@@ -192,7 +110,7 @@ void run(RunSettings settings) {
             ));
             strategies[name] = funcForks.back().get();
         } else if (name.substr(0, 7) == "lambert") {
-            std::vector<std::string> l = split(name, '-');
+            std::vector<std::string> l = utils::split(name, '-');
             double coeff = l.size() == 2 ? stod(l[1]) : defaultLambertCoefficient;
             funcForks.push_back(std::make_unique<SB::FunctionForkBehaviour>(
                 SB::FunctionForkBehaviour::lambertWithCoefficient(coeff, expectedTxFees)
@@ -251,7 +169,7 @@ void run(RunSettings settings) {
 
 
 int main(int argc, char * argv[]) {
-    auto parser = Parser();
+    auto parser = utils::Parser();
     auto args = parser.parse(argc, argv);
 
     Value satoshiPerBitcoin(100000000); // search SATOSHI_PER_BITCOIN in original project
