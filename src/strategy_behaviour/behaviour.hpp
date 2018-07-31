@@ -12,7 +12,7 @@ namespace mining_game {
 
 namespace MG = mining_game;
 
-namespace learning_model {
+namespace strategy_behaviour {
 
     class Behaviour {
     public:

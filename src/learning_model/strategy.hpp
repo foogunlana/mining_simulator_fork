@@ -7,21 +7,21 @@
 #define strategy_hpp
 
 #include "src/utils/typeDefs.hpp"
-
+#include "src/strategy_behaviour/behaviour.hpp"
 
 #include <string>
 
-namespace learning_model {
+namespace SB = strategy_behaviour;
 
-    class Behaviour;
+namespace learning_model {
 
     class Strategy {
     public:
         std::string name;
         StratWeight weight;
-        const Behaviour *behaviour;
+        const SB::Behaviour *behaviour;
 
-        Strategy(std::string name, StratWeight weight, const Behaviour *behaviour);
+        Strategy(std::string name, StratWeight weight, const SB::Behaviour *behaviour);
     };
 }
 

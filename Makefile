@@ -9,8 +9,12 @@ LDLIBS := -lgsl -lcblas
 # LDLIBS := -lgsl
 
 # MODULES := learning_model,utils
-SRCS := $(wildcard src/learning_model/*.cpp) $(wildcard src/utils/*.cpp) $(wildcard src/mining_game/*.cpp)
-OBJS := $(patsubst %.cpp,%.o,$(SRCS))
+SRCS := $(wildcard src/learning_model/*.cpp)
+SRCS += $(wildcard src/mining_game/*.cpp)
+SRCS += $(wildcard src/strategy_behaviour/*.cpp)
+SRCS += $(wildcard src/utils/*.cpp)
+
+OBJS = $(patsubst %.cpp,%.o,$(SRCS))
 MAIN := src/main.cpp
 
 CATCH_TST := tests/test_main

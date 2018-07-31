@@ -10,11 +10,11 @@
 #include "src/mining_game/miner_group.hpp"
 #include "src/mining_game/game.hpp"
 #include "src/mining_game/blockchain.hpp"
-#include "src/mining_game/default_behaviour.hpp"
-#include "src/mining_game/petty_behaviour.hpp"
-#include "src/mining_game/lazy_fork_behaviour.hpp"
-#include "src/mining_game/payforward_behaviour.hpp"
-#include "src/mining_game/function_fork_behaviour.hpp"
+#include "src/strategy_behaviour/default_behaviour.hpp"
+#include "src/strategy_behaviour/petty_behaviour.hpp"
+#include "src/strategy_behaviour/lazy_fork_behaviour.hpp"
+#include "src/strategy_behaviour/payforward_behaviour.hpp"
+#include "src/strategy_behaviour/function_fork_behaviour.hpp"
 
 #include "lib/cxxopts/cxxopts.hpp"
 
@@ -28,6 +28,7 @@
 
 namespace LM = learning_model;
 namespace MG = mining_game;
+namespace SB = strategy_behaviour;
 
 struct RunSettings {
     unsigned int numberOfGames;
@@ -154,13 +155,13 @@ void run(RunSettings settings) {
     std::vector<std::unique_ptr<LM::Strategy>> learningStrategies;
     StratWeight defaultWeight(1);
 
-    auto honest = std::make_unique<MG::DefaultBehaviour>();
-    auto petty = std::make_unique<MG::PettyBehaviour>();
-    auto payforward = std::make_unique<MG::PayforwardBehaviour>();
-    auto lazyFork = std::make_unique<MG::LazyForkBehaviour>();
-    std::vector<std::unique_ptr<LM::Behaviour>> funcForks;
+    auto honest = std::make_unique<SB::DefaultBehaviour>();
+    auto petty = std::make_unique<SB::PettyBehaviour>();
+    auto payforward = std::make_unique<SB::PayforwardBehaviour>();
+    auto lazyFork = std::make_unique<SB::LazyForkBehaviour>();
+    std::vector<std::unique_ptr<SB::Behaviour>> funcForks;
 
-    std::map<std::string, LM::Behaviour *> strategies {
+    std::map<std::string, SB::Behaviour *> strategies {
         {"honest", honest.get()},
         {"petty", petty.get()},
         {"payforward", payforward.get()},
@@ -186,15 +187,15 @@ void run(RunSettings settings) {
             std::vector<std::string> f = split(name, '-');
             assert(f.size() == 2);
             int coeff = stoi(f[1]);
-            funcForks.push_back(std::make_unique<MG::FunctionForkBehaviour>(
-                MG::FunctionForkBehaviour::forkWithCoefficient(coeff)
+            funcForks.push_back(std::make_unique<SB::FunctionForkBehaviour>(
+                SB::FunctionForkBehaviour::forkWithCoefficient(coeff)
             ));
             strategies[name] = funcForks.back().get();
         } else if (name.substr(0, 7) == "lambert") {
             std::vector<std::string> l = split(name, '-');
             double coeff = l.size() == 2 ? stod(l[1]) : defaultLambertCoefficient;
-            funcForks.push_back(std::make_unique<MG::FunctionForkBehaviour>(
-                MG::FunctionForkBehaviour::lambertWithCoefficient(coeff, expectedTxFees)
+            funcForks.push_back(std::make_unique<SB::FunctionForkBehaviour>(
+                SB::FunctionForkBehaviour::lambertWithCoefficient(coeff, expectedTxFees)
             ));
             strategies[name] = funcForks.back().get();
         }

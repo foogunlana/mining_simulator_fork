@@ -6,7 +6,7 @@
 #include "miner.hpp"
 #include "src/utils/utils.hpp"
 #include "src/learning_model/strategy.hpp"
-#include "src/learning_model/behaviour.hpp"
+// #include "src/strategy_behaviour/behaviour.hpp"
 
 #include "blockchain.hpp"
 #include "block.hpp"

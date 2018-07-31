@@ -1,13 +1,12 @@
 
 #include "function_fork_behaviour.hpp"
-#include "src/learning_model/behaviour.hpp"
 
-// #include "src/utils/typeDefs.hpp"
+#include "src/utils/typeDefs.hpp"
 #include "src/utils/utils.hpp"
 
-#include "block.hpp"
-#include "miner.hpp"
-#include "blockchain.hpp"
+#include "src/mining_game/block.hpp"
+#include "src/mining_game/miner.hpp"
+#include "src/mining_game/blockchain.hpp"
 
 #include <vector>
 #include <iostream>
@@ -16,13 +15,13 @@
 
 #define UNDERCUT_VALUE Value(100000)
 
-namespace mining_game {
+namespace strategy_behaviour {
 
-    bool shouldUndercut(const Blockchain & chain);
+    bool shouldUndercut(const MG::Blockchain & chain);
 
-    FunctionForkBehaviour::FunctionForkBehaviour(std::function<Value(Value)> _f) : learning_model::Behaviour(), f(_f) {}
+    FunctionForkBehaviour::FunctionForkBehaviour(std::function<Value(Value)> _f) : Behaviour(), f(_f) {}
 
-    Block & FunctionForkBehaviour::chooseParent(const Blockchain & chain, const Miner & miner) const {
+    MG::Block & FunctionForkBehaviour::chooseParent(const MG::Blockchain & chain, const MG::Miner & miner) const {
         if (shouldUndercut(chain) && (chain.getMaxHeightPub() != 0)) {
             return chain.most(chain.frontier(-1));
         } else {
@@ -30,11 +29,11 @@ namespace mining_game {
         }
     }
 
-    // Block & publish(const Blockchain & chain, const & miner) const {
+    // MG::Block & publish(const MG::Blockchain & chain, const & miner) const {
     //
     // }
 
-    Value FunctionForkBehaviour::collectFees(const Blockchain & chain, const Miner & miner, const Block & parent, Value txFeesAvailable) const {
+    Value FunctionForkBehaviour::collectFees(const MG::Blockchain & chain, const MG::Miner & miner, const MG::Block & parent, Value txFeesAvailable) const {
         if (shouldUndercut(chain) && (chain.getMaxHeightPub() != 0)) {
             return std::min(chain.gap() - UNDERCUT_VALUE, f(txFeesAvailable));
         } else {
@@ -42,19 +41,19 @@ namespace mining_game {
         }
     }
 
-    Value FunctionForkBehaviour::payForward(const Blockchain & chain, const Miner & miner, const Block & parent, Value fees) const {
+    Value FunctionForkBehaviour::payForward(const MG::Blockchain & chain, const MG::Miner & miner, const MG::Block & parent, Value fees) const {
         return Value(0);
     }
 
-    bool FunctionForkBehaviour::shouldUndercut(const Blockchain & chain) const {
+    bool FunctionForkBehaviour::shouldUndercut(const MG::Blockchain & chain) const {
         return valUnder(chain) > valCont(chain);
     }
 
-    Value FunctionForkBehaviour::valUnder(const Blockchain & chain) const {
+    Value FunctionForkBehaviour::valUnder(const MG::Blockchain & chain) const {
         return std::min(chain.gap() - UNDERCUT_VALUE, f(chain.mostRem(chain.frontier(-1))));
     }
 
-    Value FunctionForkBehaviour::valCont(const Blockchain & chain) const {
+    Value FunctionForkBehaviour::valCont(const MG::Blockchain & chain) const {
         return f(chain.mostRem(chain.frontier()));
     }
 
