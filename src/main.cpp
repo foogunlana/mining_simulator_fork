@@ -172,9 +172,9 @@ int main(int argc, char * argv[]) {
     auto parser = utils::Parser();
     auto args = parser.parse(argc, argv);
 
-    Value satoshiPerBitcoin(100000000); // search SATOSHI_PER_BITCOIN in original project
-    BlockCount expectedNumberOfBlocks(10000); // EXPECTED_NUMBER_OF_BLOCKS
-    BlockRate expectedTimeToFindBlock(600); // SEC_PER_BLOCK
+    Value satoshiPerBitcoin(args.satoshiPerBitcoin); // search SATOSHI_PER_BITCOIN in original project
+    BlockCount expectedNumberOfBlocks(args.expectedNumberOfBlocks); // EXPECTED_NUMBER_OF_BLOCKS
+    BlockRate expectedTimeToFindBlock(args.expectedTimeToFindBlock); // SEC_PER_BLOCK
     BlockValue blockReward(args.blockReward * satoshiPerBitcoin); // BLOCK_REWARD
     BlockValue transactionFeeRate((args.txFees1Block * satoshiPerBitcoin)/expectedTimeToFindBlock);  //TRANSACTION_FEE_RATE
     Value payforward(args.payforward * satoshiPerBitcoin);

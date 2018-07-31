@@ -13,6 +13,9 @@ namespace utils {
         unsigned int payforward;
         unsigned int minerCount;
         unsigned int defaultMinerCount;
+        unsigned int satoshiPerBitcoin;
+        unsigned int expectedNumberOfBlocks;
+        unsigned int expectedTimeToFindBlock;
         std::vector<std::string> strategies;
         std::string out;
         bool commentary;
