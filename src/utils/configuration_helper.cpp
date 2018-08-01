@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <map>
 
 namespace utils {
     ConfigurationHelper::ConfigurationHelper() {}
@@ -35,6 +36,7 @@ namespace utils {
             ("blocks-per-epoch", "expected # blocks in 1 game", cxxopts::value<unsigned int>())
             ("block-time", "expected # of seconds taken to find 1 block", cxxopts::value<unsigned int>())
             ("config", "path to the config.json file containing parameters", cxxopts::value<std::string>())
+            ("y,modify-strategies", "use strategies in config but replace appropriate ones with args provided", cxxopts::value<std::string>())
             ("c,commentary", "turn on commentary on games")
             ;
             
@@ -79,6 +81,10 @@ namespace utils {
             if (result.count("o")) {
                 config.out = result["o"].as<std::string>();
             }
+            if (result.count("strategies") && (result.count("modify-strategies"))) {
+                std::cout << "Cannot specify strategies and strategy modifiers together" << std::endl;
+                exit(1);
+            }
             if (result.count("strategies")) {
                 config.strategies.clear();
                 std::vector<std::string> strategies = split(result["strategies"].as<std::string>(), ',');
@@ -88,7 +94,23 @@ namespace utils {
                     double weight = nw.size() == 2 ? stod(nw[1]) : 1;
                     config.strategies.push_back(std::make_pair(name, weight));
                 }
-            };
+            } else if (result.count("modify-strategies")) {
+                std::vector<std::string> strategies = split(result["modify-strategies"].as<std::string>(), ',');
+                std::map<std::string, size_t> indices;
+                for (size_t i = 0; i < config.strategies.size(); i++) {
+                    indices[config.strategies[i].first] = i;
+                }
+                for (auto &s : strategies) {
+                    std::vector<std::string> nw = split(s, ':');
+                    std::string name = nw[0];
+                    if (indices.find(name) == indices.end()) {
+                        std::cout << "No such strategy '" << name << "' to modify";
+                        exit(1);
+                    }
+                    double weight = nw.size() == 2 ? stod(nw[1]) : 1;
+                    config.strategies[indices[name]] = std::make_pair(name, weight);
+                }
+            }
         } catch (const cxxopts::OptionException& e) {
             std::cout << "error parsing options: " << e.what() << std::endl;
             exit(1);
