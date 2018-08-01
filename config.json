@@ -13,6 +13,16 @@
   "strategies": [
     ["petty", 1],
     ["payforward", 1],
-    ["lazy", 1]
+    ["lazy", 1],
+    ["fork-1", 1],
+    ["fork-2", 1],
+    ["fork-4", 1],
+    ["fork-8", 1],
+    ["fork-16", 1],
+    ["fork-32", 1],
+    ["fork-64", 1],
+    ["fork-128", 1],
+    ["fork-256", 1],
+    ["lambert", 1]
   ]
 }
