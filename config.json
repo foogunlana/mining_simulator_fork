@@ -1,24 +1,18 @@
 {
-  "numGames": "1000",
-  "txFees1Block": "50",
-  "blockReward": "0",
-  "payforward": "0",
-  "minerCount": "200",
-  "defaultMinerCount": "0",
-  "satoshiPerBitcoin": "100000000",
-  "expectedNumberOfBlocks": "10000",
-  "expectedTimeToFindBlock": "600",
+  "numGames": 1000,
+  "txFees1Block": 50,
+  "blockReward": 0,
+  "payforward": 0,
+  "minerCount": 200,
+  "defaultMinerCount": 0,
+  "satoshiPerBitcoin": 100000000,
+  "expectedNumberOfBlocks": 10000,
+  "expectedTimeToFindBlock": 600,
   "out": "results",
-  "commentary": "false",
-  "strategies": [{
-      "name": "petty",
-      "weight": "1"
-    }, {
-      "name": "payforward",
-      "weight": "1"
-    }, {
-      "name": "lazy",
-      "weight": "1"
-    }
+  "commentary": false,
+  "strategies": [
+    ["petty", 1],
+    ["payforward", 1],
+    ["lazy", 1]
   ]
 }

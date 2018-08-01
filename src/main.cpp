@@ -16,7 +16,8 @@
 #include "src/strategy_behaviour/payforward_behaviour.hpp"
 #include "src/strategy_behaviour/function_fork_behaviour.hpp"
 #include "src/utils/utils.hpp"
-#include "src/utils/parser.hpp"
+#include "src/utils/configuration_helper.hpp"
+#include "src/utils/configuration.hpp"
 
 #include <vector>
 #include <iostream>
@@ -25,6 +26,8 @@
 #include <string>
 #include <map>
 #include <sstream>
+#include <fstream>
+#include <ostream>
 
 namespace LM = learning_model;
 namespace MG = mining_game;
@@ -42,7 +45,12 @@ std::string makeResultsFolder(std::string resultFolder);
 Value calculateMaxProfit(RunSettings settings);
 void run(RunSettings settings);
 void writeWeights(unsigned int gameNum, LM::Exp3 model, std::vector<std::ofstream> & outputStreams);
+void progress(unsigned int gameNum, unsigned int numGames);
 
+void progress(unsigned int gameNum, unsigned int numGames) {
+    std::cerr << "Running game " << gameNum+1 << "/" << numGames << '\r'; // running game
+    if (gameNum+1 == numGames) std::cout << std::endl;
+}
 
 void writeWeights(unsigned int gameNum, LM::Exp3 model, std::vector<std::ofstream> & outputStreams) {
     auto strategyWeights = model.getStrategyWeights();
@@ -72,11 +80,13 @@ void run(RunSettings settings) {
 
     std::vector<std::unique_ptr<LM::Strategy>> learningStrategies;
     StratWeight defaultWeight(1);
-
+    auto resultFolder = makeResultsFolder(settings.folderPrefix);
+    
     auto honest = std::make_unique<SB::DefaultBehaviour>();
     auto petty = std::make_unique<SB::PettyBehaviour>();
     auto payforward = std::make_unique<SB::PayforwardBehaviour>();
     auto lazyFork = std::make_unique<SB::LazyForkBehaviour>();
+    auto defaultStrategy = std::make_unique<LM::Strategy>("honest", defaultWeight, honest.get());
     std::vector<std::unique_ptr<SB::Behaviour>> funcForks;
 
     std::map<std::string, SB::Behaviour *> strategies {
@@ -86,11 +96,7 @@ void run(RunSettings settings) {
         {"lazy", lazyFork.get()},
     };
 
-    auto resultFolder = makeResultsFolder(settings.folderPrefix);
-    auto defaultStrategy(std::make_unique<LM::Strategy>("honest", defaultWeight, honest.get()));
-
     std::vector<std::ofstream> outputStreams;
-    double defaultWeightScale(1);
     double defaultLambertCoefficient(0.13533528323661);
     //coeff for lambert func equil  must be in [0,.2]
     //0.13533528323661 = 1/(e^2)
@@ -98,9 +104,8 @@ void run(RunSettings settings) {
         settings.gameSettings.blockchainSettings.secondsPerBlock * settings.gameSettings.blockchainSettings.transactionFeeRate);
     
     for (auto &strategy : settings.gameSettings.strategies) {
-        std::vector<std::string> s = utils::split(strategy, ':');
-        std::string name = s[0];
-        double weightScaling = s.size() == 2 ? stod(s[1]) : defaultWeightScale;
+        std::string name = strategy.first;
+        double weightScaling = strategy.second;
         if (name.substr(0, 4) == "fork") {
             std::vector<std::string> f = utils::split(name, '-');
             assert(f.size() == 2);
@@ -117,8 +122,9 @@ void run(RunSettings settings) {
             ));
             strategies[name] = funcForks.back().get();
         }
-        learningStrategies.push_back(std::make_unique<LM::Strategy>(strategy, weightScaling * defaultWeight, strategies[name]));
-        outputStreams.push_back(std::ofstream(resultFolder + "/" + strategy + ".txt"));
+        learningStrategies.push_back(std::make_unique<LM::Strategy>(name, weightScaling * defaultWeight, strategies[name]));
+        std::string fullname  = name + std::to_string(weightScaling);
+        outputStreams.push_back(std::ofstream(resultFolder + "/" + fullname + ".txt"));
     }
 
     std::vector<LM::Strategy *> expLearningStrategies;
@@ -145,8 +151,9 @@ void run(RunSettings settings) {
     MG::Game game(settings.gameSettings);
 
     writeWeights(0, model, outputStreams);
-
+    
     for (unsigned int gameNum = 0; gameNum < settings.numberOfGames; gameNum++) {
+        progress(gameNum, settings.numberOfGames);
         blockchain->reset();
         minerGroup->reset(*blockchain.get());
 
@@ -169,16 +176,17 @@ void run(RunSettings settings) {
 
 
 int main(int argc, char * argv[]) {
-    auto parser = utils::Parser();
-    auto args = parser.parse(argc, argv);
-
-    Value satoshiPerBitcoin(args.satoshiPerBitcoin); // search SATOSHI_PER_BITCOIN in original project
-    BlockCount expectedNumberOfBlocks(args.expectedNumberOfBlocks); // EXPECTED_NUMBER_OF_BLOCKS
-    BlockRate expectedTimeToFindBlock(args.expectedTimeToFindBlock); // SEC_PER_BLOCK
-    BlockValue blockReward(args.blockReward * satoshiPerBitcoin); // BLOCK_REWARD
-    BlockValue transactionFeeRate((args.txFees1Block * satoshiPerBitcoin)/expectedTimeToFindBlock);  //TRANSACTION_FEE_RATE
-    Value payforward(args.payforward * satoshiPerBitcoin);
-
+    auto configHelper = utils::ConfigurationHelper();
+    auto defaultConfigPath = "./config.json";
+    auto config = configHelper.parse(argc, argv, defaultConfigPath);
+    
+    Value satoshiPerBitcoin(config.satoshiPerBitcoin); // search SATOSHI_PER_BITCOIN in original project
+    BlockCount expectedNumberOfBlocks(config.expectedNumberOfBlocks); // EXPECTED_NUMBER_OF_BLOCKS
+    BlockRate expectedTimeToFindBlock(config.expectedTimeToFindBlock); // SEC_PER_BLOCK
+    BlockValue blockReward(config.blockReward * satoshiPerBitcoin); // BLOCK_REWARD
+    BlockValue transactionFeeRate((config.txFees1Block * satoshiPerBitcoin)/expectedTimeToFindBlock);  //TRANSACTION_FEE_RATE
+    Value payforward(config.payforward * satoshiPerBitcoin);
+    
     MG::BlockchainSettings blockchainSettings = {
         expectedTimeToFindBlock,
         transactionFeeRate,
@@ -186,8 +194,10 @@ int main(int argc, char * argv[]) {
         expectedNumberOfBlocks,
         payforward
     };
-
-    MG::GameSettings gameSettings = {blockchainSettings, args.commentary, args.strategies};
-    RunSettings runSettings = {args.numGames, args.minerCount, args.defaultMinerCount, gameSettings, args.out};
+    
+    MG::GameSettings gameSettings = {blockchainSettings, config.commentary, config.strategies};
+    RunSettings runSettings = {config.numGames, config.minerCount, config.defaultMinerCount, gameSettings, config.out};
+    
+    std::cout << "Using configuration: " << config << std::endl;
     run(runSettings);
 }

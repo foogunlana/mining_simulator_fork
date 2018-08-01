@@ -19,7 +19,7 @@
 namespace mining_game {
 
     Game::Game(GameSettings settings_):
-        blockchainSettings(settings_.blockchainSettings), strategyNames(settings_.strategies), commentaryOn(settings_.commentary) {}
+        blockchainSettings(settings_.blockchainSettings), strategies(settings_.strategies), commentaryOn(settings_.commentary) {}
 
     GameResult Game::run(MinerGroup &minerGroup, Blockchain &blockchain) {
 
@@ -59,8 +59,8 @@ namespace mining_game {
 
         // for commentary
         std::map<std::string, int> winningCount;
-        for (auto & s: strategyNames) {
-            winningCount[s] = 0;
+        for (auto & s: strategies) {
+            winningCount[s.first] = 0;
         }
         //
 
@@ -84,11 +84,11 @@ namespace mining_game {
                 for (const std::unique_ptr<Block> &block : blocks) {
                     std::cout << *block << std::endl;
                 }
-                std::cout << "Winner=" << winners[h] << std::endl;
+                std::cout << "winner=" << winners[h] << std::endl;
             }
             std::cout << "Blocks in winning chain: " << std::endl;
-            for (auto &s : strategyNames) {
-                std::cout << " - " << s << ": " << winningCount[s] << std::endl;
+            for (auto &s : strategies) {
+                std::cout << " - " << s.first << ":" << s.second << " - " << winningCount[s.first] << std::endl;
             }
             std::cout << "Value in winning chain=" << winningBlock.valueInChain << std::endl;
             std::cout << "Expected value=" << endTime * blockchainSettings.transactionFeeRate << std::endl;
