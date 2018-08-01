@@ -123,8 +123,7 @@ void run(RunSettings settings) {
             strategies[name] = funcForks.back().get();
         }
         learningStrategies.push_back(std::make_unique<LM::Strategy>(name, weightScaling * defaultWeight, strategies[name]));
-        std::string fullname  = name + std::to_string(weightScaling);
-        outputStreams.push_back(std::ofstream(resultFolder + "/" + fullname + ".txt"));
+        outputStreams.push_back(std::ofstream(resultFolder + "/" + name + ".txt"));
     }
 
     std::vector<LM::Strategy *> expLearningStrategies;
