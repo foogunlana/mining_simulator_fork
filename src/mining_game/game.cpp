@@ -57,13 +57,6 @@ namespace mining_game {
         std::vector<std::string> winners;
         winners.resize(winningBlock.height+1);
 
-        // for commentary
-        std::map<std::string, int> winningCount;
-        for (auto & s: strategies) {
-            winningCount[s.first] = 0;
-        }
-        //
-
         for (auto mined : winningChain) {
             if (mined->height == BlockHeight(0)) {
                 break;
@@ -75,10 +68,17 @@ namespace mining_game {
             auto &miner = *(mined->miner);
             minerResults[miner.params.number].addBlock(mined);
             totalValue += mined->realValue();
-            winningCount[miner.getStrategyName()]++;
         }
 
         if (commentaryOn) {
+            std::map<std::string, int> winningCount;
+            for (auto & s: strategies) {
+                winningCount[s.first] = 0;
+            }
+            for (auto mined : winningChain) {
+                if(mined->height == 0) continue;
+                winningCount[mined->miner->getStrategyName()]++;
+            }
             for (size_t h = 1; h < blockchain.getMaxHeightPub(); h++) {
                 const std::vector<std::unique_ptr<Block>> & blocks = blockchain.frontier(h);
                 for (const std::unique_ptr<Block> &block : blocks) {
