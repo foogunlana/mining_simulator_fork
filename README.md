@@ -1,2 +1,2 @@
-Adapted from Harry Kallodner's mining simulator (insert link...)
-----------------------------------------------------------------
+Unofficial fork of Harry Kallodner's [mining simulator](https://github.com/citp/mining_simulator)
+
