@@ -1,8 +1,3 @@
-//
-//  main.cpp
-//
-//
-
 #include "src/learning_model/exp3.hpp"
 #include "src/learning_model/strategy.hpp"
 #include "src/learning_model/player_profile.hpp"

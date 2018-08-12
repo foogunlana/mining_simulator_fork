@@ -1,11 +1,3 @@
-//
-//  utils.cpp
-//  BlockSim
-//
-//  Created by Harry Kalodner on 5/25/16.
-//  Copyright © 2016 Harry Kalodner. All rights reserved.
-//
-
 #include "utils.hpp"
 
 #include <random>

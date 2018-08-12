@@ -1,8 +1,3 @@
-//
-//  strategy.hpp
-//  learning_model
-//
-
 #ifndef strategy_hpp
 #define strategy_hpp
 
@@ -25,4 +20,4 @@ namespace learning_model {
     };
 }
 
-#endif /* strategy_hpp */
+#endif

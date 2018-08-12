@@ -1,7 +1,6 @@
 
 #include "payforward_behaviour.hpp"
 
-// #include "src/utils/typeDefs.hpp"
 #include "src/utils/utils.hpp"
 
 #include "src/mining_game/block.hpp"

@@ -1,12 +1,6 @@
-//
-//  miner.cpp
-//
-//
-
 #include "miner.hpp"
 #include "src/utils/utils.hpp"
 #include "src/learning_model/strategy.hpp"
-// #include "src/strategy_behaviour/behaviour.hpp"
 
 #include "blockchain.hpp"
 #include "block.hpp"
@@ -16,7 +10,6 @@
 #include <iostream>
 #include <cassert>
 
-// constexpr auto maxTime = BlockTime(std::numeric_limits<BlockTime>::max());
 
 namespace LM = learning_model;
 
@@ -33,13 +26,9 @@ namespace mining_game {
     void Miner::reset(Blockchain &chain) {
         _blocksMinedTotal = BlockCount(0);
         unbroadcastBlocks.clear();
-        // _nextPublishTime = BlockTime(std::numeric_limits<TimeType>::max());
-        // _lastCostUpdate = BlockTime(0);
-
         // no-one should mistakenly mine immediately the chain starts!
         _nextMiningTime = BlockTime(1) + utils::selectMiningOffset(chain.chanceToWin(params.hashRate));
         totalMiningCost = 0;
-        // waitingForBroadcast = false;
     }
 
     void Miner::changeStrategy(LM::Strategy &newStrategy) {

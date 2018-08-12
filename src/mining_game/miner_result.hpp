@@ -1,8 +1,3 @@
-//
-//  miner_result.hpp
-//
-//
-
 #ifndef miner_result_hpp
 #define miner_result_hpp
 
@@ -22,4 +17,4 @@ namespace mining_game {
     };
 }
 
-#endif /* miner_result_hpp */
+#endif

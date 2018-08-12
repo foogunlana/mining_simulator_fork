@@ -1,9 +1,3 @@
-//
-//  game.hpp
-//  BlockSim
-//
-//
-
 #ifndef game_hpp
 #define game_hpp
 
@@ -32,4 +26,4 @@ namespace mining_game {
     };
 }
 
-#endif /* game_hpp */
+#endif

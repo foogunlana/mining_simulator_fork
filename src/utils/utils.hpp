@@ -1,11 +1,3 @@
-//
-//  utils.hpp
-//  BlockSim
-//
-//  Created by Harry Kalodner on 5/25/16.
-//  Copyright © 2016 Harry Kalodner. All rights reserved.
-//
-
 #ifndef utils_hpp
 #define utils_hpp
 
@@ -25,4 +17,4 @@ namespace utils {
     std::vector<std::string> split(std::string text, char delimiter);
 }
 
-#endif /* utils_hpp */
+#endif

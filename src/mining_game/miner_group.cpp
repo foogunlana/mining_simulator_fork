@@ -1,11 +1,3 @@
-//
-//  minerGroup.cpp
-//  BlockSim
-//
-//  Created by Harry Kalodner on 6/9/16.
-//  Copyright © 2016 Harry Kalodner. All rights reserved.
-//
-
 #include "miner_group.hpp"
 #include "miner.hpp"
 #include "block.hpp"
@@ -18,7 +10,6 @@
 #include <cassert>
 #include <iostream>
 
-// constexpr auto maxTime = BlockTime(std::numeric_limits<BlockTime>::max());
 
 namespace LM = learning_model;
 

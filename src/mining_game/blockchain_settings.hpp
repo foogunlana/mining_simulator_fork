@@ -1,8 +1,3 @@
-//
-//  blockchain_settings.hpp
-//
-//
-
 #ifndef blockchain_settings_hpp
 #define blockchain_settings_hpp
 
@@ -19,4 +14,4 @@ namespace mining_game {
     };
 }
 
-#endif /* blockchain_settings_hpp */
+#endif

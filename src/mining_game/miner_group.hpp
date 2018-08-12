@@ -1,8 +1,3 @@
-//
-//  minerGroup.hpp
-//
-//
-
 #ifndef minerGroup_hpp
 #define minerGroup_hpp
 
@@ -52,4 +47,4 @@ namespace mining_game {
     };
 }
 
-#endif /* MinerGroup_hpp */
+#endif

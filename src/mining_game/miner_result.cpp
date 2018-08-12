@@ -1,8 +1,3 @@
-//
-//  miner_result.cpp
-//
-//
-
 #include "miner_result.hpp"
 #include "block.hpp"
 

@@ -1,8 +1,3 @@
-//
-//  exp3.hpp
-//  learning_model
-//
-
 #ifndef exp3_hpp
 #define exp3_hpp
 

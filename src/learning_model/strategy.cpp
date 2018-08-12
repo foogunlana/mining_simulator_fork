@@ -1,8 +1,3 @@
-//
-//  strategy.hpp
-//  learning_model
-//
-
 #include "src/learning_model/strategy.hpp"
 #include "src/utils/typeDefs.hpp"
 #include "src/strategy_behaviour/behaviour.hpp"

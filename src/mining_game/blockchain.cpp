@@ -1,8 +1,3 @@
-//
-//  blockchain.cpp
-//
-//
-
 #include "blockchain.hpp"
 #include "blockchain_settings.hpp"
 #include "block.hpp"
@@ -22,10 +17,7 @@ namespace mining_game {
         maxPayforwardValidHeight(0),
         payforward(blockchainSettings.payforward)
     {
-        // _blocks.reserve(rawCount(blockchainSettings.numberOfBlocks) * 2);
         blocks.resize(rawCount(blockchainSettings.numberOfBlocks) * 2);
-        // _smallestBlocks.resize(rawCount(blockchainSettings.numberOfBlocks) * 2);
-        // reset(blockchainSettings);
     }
 
     std::unique_ptr<Block> Blockchain::createBlock(Block *parent, Miner *miner, BlockParameters params) {

@@ -1,8 +1,3 @@
-//
-//  game_result.hpp
-//
-//
-
 #ifndef game_result_hpp
 #define game_result_hpp
 
@@ -28,4 +23,4 @@ namespace mining_game {
 }
 
 
-#endif /* game_result_hpp */
+#endif
