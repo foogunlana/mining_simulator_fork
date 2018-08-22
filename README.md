@@ -46,7 +46,8 @@ To see them, enter:
 ```
 
 To get started, try modifying the ```config.json``` or running ```./run -c -n 1```
-to see the commentary of a single game.
+to see the commentary of a single game, or ```./run -y payforward:0 -n 10000```
+to see the output of a game without the PayForward strategy.
 
 Output of Simulator
 ------------------------
