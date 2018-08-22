@@ -16,7 +16,7 @@ It has a single dependency: (https://www.gnu.org/software/gsl/).
 The code is written in C++14 and a Makefile is included.
 
 ```
-make test
+make test && ./test
 make run
 ```
 
