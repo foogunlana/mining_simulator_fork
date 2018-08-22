@@ -15,10 +15,10 @@ This software is currently setup to be run from the command line.
 It has a single dependency: (https://www.gnu.org/software/gsl/).
 The code is written in C++14 and a Makefile is included.
 
-'''
+```
 make test
 make run
-'''
+```
 
 Currently only the learning model is tested
 
@@ -41,9 +41,9 @@ reward and transaction fee accumulation rate. More documentation to follow.
 
 Parameters are configurable via a ```config.json``` or via runtime parameters.
 To see them, enter:
-'''
+```
 ./run -h
-'''
+```
 
 To get started, try modifying the ```config.json``` or running ```./run -c -n 1```
 to see the commentary of a single game.
